@@ -6,7 +6,11 @@ export const Inicio = () => {
   return (
     <div className="pagina-inicio">
       <Navbar />
+<<<<<<< HEAD
       <main className="contenido-principal" style={{ padding: '20px' }}>
+=======
+      <main className="contenido-principal">
+>>>>>>> f8a40dcc1957ee65d4c064e8dcac2160a4eb9bd2
         <section className="banner-bienvenida">
           <h2>Bienvenido a BuildMyPC</h2>
           <p>Arma tu PC gamer o de trabajo con la mejor compatibilidad.</p>
