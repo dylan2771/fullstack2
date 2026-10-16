@@ -1,16 +1,16 @@
-export const Navbar = () => {
+export const Navbar = ({ setVista }) => {
   return (
     <header className="header-principal">
-      <div className="logo">
+      <div className="logo" style={{ cursor: 'pointer' }} onClick={() => setVista('inicio')}>
         <h1>BuildMyPC</h1>
       </div>
       <nav className="nav-links">
         <ul>
-          <li><a href="#inicio">Inicio</a></li>
-          <li><a href="#catalogo">Catálogo</a></li>
-          <li><a href="#armador">Armador</a></li>
-          <li><a href="#cotizaciones">Cotizaciones</a></li>
-          <li><a href="#login">Iniciar Sesión</a></li>
+          <li><button type="button" onClick={() => setVista('inicio')}>Inicio</button></li>
+          <li><button type="button" onClick={() => setVista('catalogo')}>Catálogo</button></li>
+          <li><button type="button" onClick={() => setVista('armador')}>Armador</button></li>
+          <li><button type="button" onClick={() => setVista('cotizaciones')}>Cotizaciones</button></li>
+          <li><button type="button" onClick={() => setVista('login')}>Iniciar Sesión</button></li>
         </ul>
       </nav>
     </header>
