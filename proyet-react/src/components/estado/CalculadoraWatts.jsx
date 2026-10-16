@@ -34,11 +34,11 @@ export const CalculadoraWatts = () => {
               className={`opcion-hardware ${estaSeleccionado ? 'seleccionado' : ''}`}
               onClick={() => toggleComponente(prod)}
             >
-              <input 
-                type="checkbox" 
-                checked={estaSeleccionado} 
-                onChange={() => {}} 
-              />
+             <input 
+              type="checkbox" 
+              checked={estaSeleccionado} 
+              readOnly 
+            />
               <span>{prod.nombre}</span>
               <small>{prod.watts}W</small>
               <strong>{formatearCLP(prod.precio)}</strong>
