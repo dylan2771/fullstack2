@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import './styles/Utilidades.css';
 import './App.css';
+
+import { Navbar } from './components/basicos/Navbar';
+import { Footer } from './components/basicos/Footer';
 
 import { Inicio } from './pages/Inicio';
 import { Catalogo } from './pages/Catalogo';
@@ -7,15 +11,34 @@ import { Armador } from './pages/Armador';
 import { Auth } from './pages/Auth';
 
 export function App() {
+  // Estado principal para la navegación ('inicio', 'catalogo', 'armador', 'auth')
+  const [vistaActual, setVistaActual] = useState('inicio');
+
+  // Renderizado condicional según la vista seleccionada
+  const renderizarVista = () => {
+    switch (vistaActual) {
+      case 'inicio':
+        return <Inicio />;
+      case 'catalogo':
+        return <Catalogo />;
+      case 'armador':
+        return <Armador />;
+      case 'auth':
+        return <Auth />;
+      default:
+        return <Inicio />;
+    }
+  };
+
   return (
     <div className="app-container">
-      <Inicio />
-      <hr />
-      <Catalogo />
-      <hr />
-      <Armador />
-      <hr />
-      <Auth />
+      {/* Pasamos la función para cambiar de vista al Navbar */}
+      <Navbar setVista={setVistaActual} vistaActual={vistaActual} />
+      
+      {/* Se muestra solo la página seleccionada */}
+      {renderizarVista()}
+
+      <Footer />
     </div>
   );
 }
