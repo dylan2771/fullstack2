@@ -9,14 +9,10 @@ import { Inicio } from './pages/Inicio';
 import { Catalogo } from './pages/Catalogo';
 import { Armador } from './pages/Armador';
 import { Auth } from './pages/Auth';
-// Importa aquí tu componente o página de Cotizaciones si lo tienes por separado:
-// import { Cotizaciones } from './pages/Cotizaciones';
 
 export function App() {
-  // Estado principal para la navegación
   const [vistaActual, setVistaActual] = useState('inicio');
 
-  // Renderizado condicional según la vista seleccionada
   const renderizarVista = () => {
     switch (vistaActual) {
       case 'inicio':
@@ -26,9 +22,11 @@ export function App() {
       case 'armador':
         return <Armador />;
       case 'cotizaciones':
-        // Si no tienes una página Cotizaciones separada aún, renderiza la vista que corresponda
-        return <Auth />; // Cambiar por <Cotizaciones /> según tu proyecto
+        // Acepta 'cotizaciones' desde el Navbar
+        return <Auth />; // Reemplaza por tu componente <Cotizaciones /> si lo tienes
       case 'login':
+      case 'auth':
+        // Acepta tanto 'login' como 'auth'
         return <Auth />;
       default:
         return <Inicio />;
@@ -37,12 +35,8 @@ export function App() {
 
   return (
     <div className="app-container">
-      {/* Pasamos la función para cambiar de vista al Navbar */}
       <Navbar setVista={setVistaActual} vistaActual={vistaActual} />
-      
-      {/* Se muestra solo la página seleccionada */}
       {renderizarVista()}
-
       <Footer />
     </div>
   );
