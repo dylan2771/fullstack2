@@ -9,9 +9,11 @@ import { Inicio } from './pages/Inicio';
 import { Catalogo } from './pages/Catalogo';
 import { Armador } from './pages/Armador';
 import { Auth } from './pages/Auth';
+// Importa aquí tu componente o página de Cotizaciones si lo tienes por separado:
+// import { Cotizaciones } from './pages/Cotizaciones';
 
 export function App() {
-  // Estado principal para la navegación ('inicio', 'catalogo', 'armador', 'auth')
+  // Estado principal para la navegación
   const [vistaActual, setVistaActual] = useState('inicio');
 
   // Renderizado condicional según la vista seleccionada
@@ -23,7 +25,10 @@ export function App() {
         return <Catalogo />;
       case 'armador':
         return <Armador />;
-      case 'auth':
+      case 'cotizaciones':
+        // Si no tienes una página Cotizaciones separada aún, renderiza la vista que corresponda
+        return <Auth />; // Cambiar por <Cotizaciones /> según tu proyecto
+      case 'login':
         return <Auth />;
       default:
         return <Inicio />;
