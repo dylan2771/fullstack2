@@ -2,25 +2,25 @@ export const productos = [
   {
     id: 1,
     nombre: 'PC Gamer Básico',
-    categoria: 'PROCESADORES', // O la categoría que uses
+    categoria: 'PC_ARMADO',
     precio: 499990,
-    consumo: '250W',
-    imagen: '/Pc_gamer_basico.png' // Apunta directo a public/
+    watts: 250,
+    imagen: '/Pc_gamer_basico.png'
   },
   {
     id: 2,
     nombre: 'PC Gamer Avanzado',
-    categoria: 'TARJETAS_GRAFICAS',
+    categoria: 'PC_ARMADO',
     precio: 899990,
-    consumo: '450W',
+    watts: 450,
     imagen: '/Pc_gamer_avanzado.jpg'
   },
   {
     id: 3,
     nombre: 'PC Gamer Pro',
-    categoria: 'PLACAS_MADRE',
+    categoria: 'PC_ARMADO',
     precio: 1499990,
-    consumo: '650W',
+    watts: 650,
     imagen: '/Pc_gamer_pro.jpg'
   }
 ];
