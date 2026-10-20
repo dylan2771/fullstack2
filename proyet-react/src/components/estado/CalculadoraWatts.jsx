@@ -23,7 +23,7 @@ export const CalculadoraWatts = () => {
   return (
     <section className="contenedor-calculadora">
       <h2>Calculadora de Consumo Energético</h2>
-      <p>Selecciona los componentes para estimar el consumo en Watts:</p>
+      <p>Selecciona los equipos para estimar el consumo en Watts:</p>
 
       <div className="lista-seleccion-hardware">
         {productos.map((prod) => {
@@ -33,21 +33,22 @@ export const CalculadoraWatts = () => {
               key={prod.id} 
               className={`opcion-hardware ${estaSeleccionado ? 'seleccionado' : ''}`}
               onClick={() => toggleComponente(prod)}
+              style={{ cursor: 'pointer', margin: '10px 0', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}
             >
-             <input 
-              type="checkbox" 
-              checked={estaSeleccionado} 
-              readOnly 
-            />
-              <span>{prod.nombre}</span>
-              <small>{prod.watts}W</small>
-              <strong>{formatearCLP(prod.precio)}</strong>
+              <input 
+                type="checkbox" 
+                checked={estaSeleccionado} 
+                readOnly 
+              />
+              <span style={{ marginLeft: '10px' }}><strong>{prod.nombre}</strong></span>
+              <small style={{ marginLeft: '10px' }}>{prod.watts}W</small>
+              <strong style={{ marginLeft: '10px' }}>{formatearCLP(prod.precio)}</strong>
             </div>
           );
         })}
       </div>
 
-      <div className="resumen-calculo">
+      <div className="resumen-calculo" style={{ marginTop: '20px', padding: '15px', background: '#f5f5f5', borderRadius: '5px' }}>
         <h3>Resumen de Consumo</h3>
         <p>Consumo Estimado: <strong>{wattsTotales} Watts</strong></p>
         <p>Fuente Recomendada: <strong>{fuenteRecomendada}W o superior</strong></p>
