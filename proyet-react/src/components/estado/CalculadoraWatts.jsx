@@ -19,15 +19,22 @@ export const CalculadoraWatts = () => {
 
   const wattsTotales = calcularConsumoTotalWatts(componentesSeleccionados);
   const fuenteRecomendada = obtenerFuenteRecomendadaWatts(wattsTotales);
+  const precioTotal = componentesSeleccionados.reduce((total, item) => total + (item.precio || 0), 0);
 
   return (
-    <section className="contenedor-calculadora p-4 rounded text-white" style={{ backgroundColor: '#0B0F19' }}>
-      <h2 className="text-center mb-3" style={{ color: '#00FF66' }}>Calculadora de Consumo Energético</h2>
-      <p className="text-center mb-4" style={{ color: '#9CA3AF' }}>
-        Selecciona los equipos para estimar el consumo en Watts:
-      </p>
+    <section 
+      className="contenedor-calculadora p-4 rounded text-white" 
+      style={{ backgroundColor: '#0B0F19', border: '1px solid #1F2937', borderRadius: '12px' }}
+    >
+      <div className="text-start mb-4">
+        <h2 className="fw-bold mb-1" style={{ color: '#00FF66' }}>⚡ Calculadora de Consumo Energético</h2>
+        <p className="text-secondary small mb-0">
+          Selecciona los componentes para estimar el consumo en Watts y la fuente recomendada.
+        </p>
+      </div>
 
-      <div className="lista-seleccion-hardware">
+      {/* Lista de Hardware Seleccionable */}
+      <div className="lista-seleccion-hardware mb-4">
         {productos.map((prod) => {
           const estaSeleccionado = componentesSeleccionados.some((item) => item.id === prod.id);
           return (
@@ -39,40 +46,70 @@ export const CalculadoraWatts = () => {
                 cursor: 'pointer', 
                 backgroundColor: estaSeleccionado ? '#112217' : '#111827', 
                 border: estaSeleccionado ? '2px solid #00FF66' : '1px solid #1F2937',
-                boxShadow: estaSeleccionado ? '0 0 10px rgba(0, 255, 102, 0.25)' : 'none',
+                boxShadow: estaSeleccionado ? '0 0 12px rgba(0, 255, 102, 0.2)' : 'none',
                 transition: 'all 0.2s ease'
               }}
             >
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center gap-3">
                 <input 
                   type="checkbox" 
                   checked={estaSeleccionado} 
                   readOnly 
                   style={{ accentColor: '#00FF66', transform: 'scale(1.2)', cursor: 'pointer' }}
                 />
-                <span style={{ marginLeft: '12px', color: '#FFFFFF', fontWeight: 'bold' }}>
+                <span className="fw-bold text-white fs-6">
                   {prod.nombre}
                 </span>
               </div>
+
               <div className="d-flex align-items-center gap-3">
-                <span className="badge" style={{ backgroundColor: '#00FF66', color: '#000000', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                <span 
+                  className="badge px-2 py-1 fw-bold" 
+                  style={{ backgroundColor: '#00FF66', color: '#000000', fontSize: '0.85rem' }}
+                >
                   {prod.watts}W
                 </span>
-                <strong style={{ color: '#00FF66' }}>{formatearCLP(prod.precio)}</strong>
+                <strong style={{ color: '#00FF66', minWidth: '90px', textAlign: 'right' }}>
+                  {formatearCLP(prod.precio)}
+                </strong>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="resumen-calculo mt-4 p-3 rounded" style={{ backgroundColor: '#111827', border: '1px solid #00FF66' }}>
-        <h3 style={{ color: '#00FF66', fontSize: '1.25rem' }} className="mb-2">Resumen de Consumo</h3>
-        <p className="mb-1" style={{ color: '#E5E7EB' }}>
-          Consumo Estimado: <strong style={{ color: '#00FF66' }}>{wattsTotales} Watts</strong>
-        </p>
-        <p className="mb-0" style={{ color: '#E5E7EB' }}>
-          Fuente Recomendada: <strong style={{ color: '#00FF66' }}>{fuenteRecomendada}W o superior</strong>
-        </p>
+      {/* Tarjeta de Resumen Energético */}
+      <div 
+        className="resumen-calculo p-4 rounded" 
+        style={{ 
+          backgroundColor: '#111827', 
+          border: '1px solid #00FF66',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
+        }}
+      >
+        <div className="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
+          <h3 style={{ color: '#00FF66', fontSize: '1.2rem' }} className="fw-bold m-0">
+            📊 Resumen Energético & Cotización
+          </h3>
+          <span className="badge bg-dark border border-secondary text-secondary">
+            {componentesSeleccionados.length} componentes
+          </span>
+        </div>
+
+        <div className="row g-3 text-start">
+          <div className="col-md-4">
+            <span className="text-secondary small d-block">Consumo Estimado:</span>
+            <strong className="fs-5" style={{ color: '#00FF66' }}>{wattsTotales} Watts</strong>
+          </div>
+          <div className="col-md-4">
+            <span className="text-secondary small d-block">Fuente Recomendada:</span>
+            <strong className="fs-5" style={{ color: '#00FF66' }}>{fuenteRecomendada}W o superior</strong>
+          </div>
+          <div className="col-md-4">
+            <span className="text-secondary small d-block">Total Estimado:</span>
+            <strong className="fs-5 text-white">{formatearCLP(precioTotal)}</strong>
+          </div>
+        </div>
       </div>
     </section>
   );
