@@ -49,7 +49,7 @@ export const productos = [
   },
   {
     id: 7,
-    nombre: "Kit Memoria RAM DDR5 32GB (2x16GB) 6000MHz",
+    nombre: "Kit Memoria RAM DDR5 32GB (2x16GB)",
     watts: 15,
     precio: 129990,
     categoria: "Gamer",
