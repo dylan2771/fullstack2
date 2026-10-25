@@ -1,16 +1,40 @@
-# React + Vite
+# ⚡ BuildMyPC - Configurador de Hardware & Calculadora Energética
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Plataforma web desarrollada en **React** que permite a los usuarios seleccionar componentes de hardware de alto rendimiento, consultar el catálogo disponible y calcular en tiempo real el consumo energético total (Watts), la fuente de poder recomendada y el desglose de precios con IVA.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler
+> 🌐 **Demo en vivo desplegada en Vercel:** [https://fullstack2026-uh7v.vercel.app/](https://fullstack2026-uh7v.vercel.app/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+## 👥 Integrantes del Equipo
+* **Joaquín Ferrada**
+* **Maximiliano Veas**
+* **Dylan Navarrete**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+---
+
+## 🚀 Tecnologías Utilizadas
+* **Frontend**: React 18, Vite
+* **Estilos**: Bootstrap 5, Custom CSS (Tema Dark `#0B0F19` / `#00FF66`)
+* **Testing Unitario**: Vitest
+* **Control de Versiones**: Git & GitHub
+
+---
+
+## 🛠️ Estructura del Proyecto
+
+```text
+src/
+├── components/          # Componentes de interfaz (UI)
+│   ├── basicos/         # Footer, Navbar
+│   ├── estado/          # CalculadoraWatts (Armador Interactivo)
+│   └── props/           # ListaProductos, TarjetaProducto
+├── logica/              # Módulos de lógica de negocio pura
+│   ├── armador.js       # Suma de watts y cálculo de fuente recomendada
+│   ├── datos.js         # Inventario y catálogo de componentes
+│   ├── formato.js       # Formateo CLP y cálculo de IVA
+│   └── *.spec.js        # Cobertura de pruebas unitarias
+├── pages/               # Vistas principales (Inicio, Catalogo, Armador)
+└── App.jsx              # Enrutamiento y estructura global
