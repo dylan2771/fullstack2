@@ -37,7 +37,7 @@ export const productos = [
     watts: 253,
     precio: 629990,
     categoria: "Workstation",
-    imagen: "https://images.unsplash.com/photo-1616588589676-63b3dd49426b?q=80&w=600&auto=format&fit=crop"
+    imagen: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: 6,
