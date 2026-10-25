@@ -13,7 +13,7 @@ export const Inicio = ({ setVista }) => {
                 className="badge mb-3 px-3 py-2 fw-bold" 
                 style={{ backgroundColor: 'rgba(0, 255, 102, 0.15)', color: '#00FF66', border: '1px solid #00FF66' }}
               >
-                ⚡ Plataforma de Armado de PCs #1
+                ⚡ Plataforma de Armado de PCs 
               </span>
               <h1 className="display-4 fw-bold text-white mb-3">
                 Bienvenido a <span style={{ color: '#00FF66' }}>BuildMyPC</span>
