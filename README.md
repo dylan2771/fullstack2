@@ -3,8 +3,7 @@
 Plataforma web desarrollada en **React** que permite a los usuarios seleccionar componentes de hardware de alto rendimiento, consultar el catálogo disponible y calcular en tiempo real el consumo energético total (Watts), la fuente de poder recomendada y el desglose de precios con IVA.
 
 
-
-> 🌐 **Demo en vivo desplegada en Vercel:** [https://fullstack2026-uh7v.vercel.app/](https://fullstack2026-uh7v.vercel.app/)
+> 🌐 **Demo en vivo desplegada en Vercel:** [https://desarrollo-fullstack2.vercel.app/](https://desarrollo-fullstack2.vercel.app/)
 
 ---
 
