@@ -1,7 +1,8 @@
+// src/pages/Catalogo.jsx
 import { ListaProductos } from '../components/props/ListaProductos';
 import { productos } from '../logica/datos';
 
-export const Catalogo = () => {
+export const Catalogo = ({ onAgregar }) => {
   return (
     <main className="contenedor-catalogo container py-5">
       {/* Encabezado del Catálogo */}
@@ -20,9 +21,9 @@ export const Catalogo = () => {
         </p>
       </div>
 
-      {/* Listado de Productos */}
+      {/* Listado de Productos con conexión al Carrito */}
       <div className="seccion-productos">
-        <ListaProductos productos={productos} />
+        <ListaProductos productos={productos} onAgregar={onAgregar} />
       </div>
     </main>
   );

@@ -1,57 +1,67 @@
-export const TarjetaProducto = ({ nombre, precio, watts, imagen, categoria }) => {
+// src/components/props/TarjetaProducto.jsx
+import React from 'react';
+import { formatearCLP } from '../../logica/formato';
+
+export const TarjetaProducto = ({ producto, onAgregar }) => {
+  if (!producto) return null;
+
+  const { id, nombre, precio, watts, imagen, categoria } = producto;
+
+  const handleAgregar = () => {
+    if (onAgregar) {
+      onAgregar({
+        id,
+        nombre,
+        precio,
+        watts,
+        imagen,
+        cantidad: 1
+      });
+    }
+  };
+
   return (
     <div 
-      className="card h-100 p-3 text-start" 
-      style={{ 
-        backgroundColor: '#111827', 
-        border: '1px solid #1F2937', 
-        borderRadius: '12px',
-        transition: 'border-color 0.2s ease'
-      }}
+      className="card h-100 p-3 text-white border-secondary shadow-sm" 
+      style={{ backgroundColor: '#111827', borderRadius: '10px' }}
     >
-      {/* Tags superiores */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <span className="badge text-uppercase" style={{ backgroundColor: '#1F2937', color: '#00FF66' }}>
-          {categoria || 'Hardware'}
-        </span>
-        {watts && (
-          <span 
-            className="badge fw-bold" 
-            style={{ backgroundColor: 'rgba(0, 255, 102, 0.15)', color: '#00FF66', border: '1px solid #00FF66' }}
-          >
-            ⚡ {watts}W
-          </span>
-        )}
-      </div>
-
-      {/* Visor de Imagen */}
-      <div 
-        className="p-3 text-center mb-3 rounded d-flex align-items-center justify-content-center" 
-        style={{ backgroundColor: '#0B0F19', minHeight: '180px' }}
-      >
+      {imagen && (
         <img 
-          src={imagen || 'https://via.placeholder.com/180'} 
+          src={imagen} 
           alt={nombre} 
-          className="img-fluid"
-          style={{ maxHeight: '150px', objectFit: 'contain' }}
+          className="card-img-top rounded mb-3"
+          style={{ height: '180px', objectFit: 'contain', backgroundColor: '#080C14', padding: '10px' }}
         />
-      </div>
+      )}
 
-      {/* Información de Precio y Botón */}
-      <div className="card-body p-0 d-flex flex-column justify-content-between">
+      <div className="card-body d-flex flex-column justify-content-between p-0">
         <div>
-          <h5 className="fw-bold text-white mb-2">{nombre}</h5>
+          {categoria && (
+            <span className="badge bg-secondary mb-2 text-uppercase" style={{ fontSize: '0.7rem' }}>
+              {categoria}
+            </span>
+          )}
+          <h5 className="card-title fw-bold text-white mb-2">{nombre}</h5>
+          {watts && <p className="text-muted small mb-2">⚡ Consumo: {watts}W</p>}
         </div>
+
         <div className="mt-3">
-          <div className="fs-4 fw-bold mb-3" style={{ color: '#00FF66' }}>
-            ${precio ? precio.toLocaleString('es-CL') : '0'} CLP
+          <div className="fs-4 fw-bold text-success mb-3">
+            {formatearCLP(precio)}
           </div>
-          <button 
+
+          <button
             type="button"
-            className="btn w-100 fw-bold py-2"
-            style={{ backgroundColor: '#00FF66', color: '#000000', border: 'none', borderRadius: '6px' }}
+            className="btn w-100 fw-bold text-dark d-flex align-items-center justify-content-center gap-2"
+            style={{ 
+              backgroundColor: '#00FF66', 
+              border: 'none',
+              borderRadius: '6px',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={handleAgregar}
           >
-            Agregar ⚡
+            🛒 Añadir al Carrito
           </button>
         </div>
       </div>
