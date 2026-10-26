@@ -1,4 +1,5 @@
 // src/pages/Catalogo.jsx
+import React from 'react';
 import { ListaProductos } from '../components/props/ListaProductos';
 import { productos } from '../logica/datos';
 
@@ -21,7 +22,7 @@ export const Catalogo = ({ onAgregar }) => {
         </p>
       </div>
 
-      {/* Listado de Productos con conexión al Carrito */}
+      {/* Listado de Productos Oficiales */}
       <div className="seccion-productos">
         <ListaProductos productos={productos} onAgregar={onAgregar} />
       </div>
