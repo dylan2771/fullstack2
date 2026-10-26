@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './styles/Utilidades.css';
 import './App.css';
 
@@ -11,7 +11,6 @@ import { Catalogo } from './pages/Catalogo';
 import { Armador } from './pages/Armador';
 import { Auth } from './pages/Auth';
 
-// Funciones de la capa de lógica (src/logica/carrito.js)
 import { 
   agregarAlCarrito, 
   eliminarDelCarrito, 
@@ -22,12 +21,30 @@ import {
 export function App() {
   const [vistaActual, setVistaActual] = useState('inicio');
 
-  // Estado del Carrito de Compras
-  const [carrito, setCarrito] = useState([]);
+  // Carga inicial respaldada desde localStorage para no perder los productos al recargar
+  const [carrito, setCarrito] = useState(() => {
+    try {
+      const guardado = localStorage.getItem('buildmypc_carrito');
+      return guardado ? JSON.parse(guardado) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [showCarrito, setShowCarrito] = useState(false);
 
-  // Manejadores del Estado del Carrito
+  // Guarda automáticamente en localStorage ante cualquier cambio en el carrito
+  useEffect(() => {
+    try {
+      localStorage.setItem('buildmypc_carrito', JSON.stringify(carrito));
+    } catch (e) {
+      console.error('Error al guardar el carrito:', e);
+    }
+  }, [carrito]);
+
+  // Manejadores con validaciones
   const handleAgregarAlCarrito = (producto) => {
+    if (!producto || !producto.id) return;
     setCarrito((prev) => agregarAlCarrito(prev, producto));
   };
 
@@ -52,7 +69,6 @@ export function App() {
       case 'armador':
         return <Armador onAgregar={handleAgregarAlCarrito} />;
       case 'cotizaciones':
-        return <Auth />;
       case 'login':
       case 'auth':
         return <Auth />;

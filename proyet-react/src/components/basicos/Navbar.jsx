@@ -50,31 +50,32 @@ export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpe
             );
           })}
 
-          {/* Botón Carrito de Compras */}
+          {/* Botón Carrito con animación y badge notificadora */}
           <button
             type="button"
-            className="btn btn-sm position-relative ms-1 px-3 py-2 fw-bold"
+            className="btn btn-sm position-relative ms-2 px-3 py-2 fw-bold d-flex align-items-center gap-2"
             style={{
-              backgroundColor: '#111827',
-              color: '#00FF66',
+              backgroundColor: totalItems > 0 ? '#00FF66' : '#111827',
+              color: totalItems > 0 ? '#000000' : '#00FF66',
               border: '1px solid #00FF66',
               borderRadius: '6px',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              boxShadow: totalItems > 0 ? '0 0 12px rgba(0, 255, 102, 0.4)' : 'none'
             }}
             onClick={onOpenCarrito}
           >
-            🛒 Carrito
+            🛒 <span>Carrito</span>
             {totalItems > 0 && (
               <span 
-                className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                style={{ backgroundColor: '#00FF66', color: '#000000', fontSize: '0.75rem' }}
+                className="badge rounded-pill bg-dark text-white ms-1 fw-bold"
+                style={{ fontSize: '0.75rem', border: '1px solid #00FF66' }}
               >
                 {totalItems}
               </span>
             )}
           </button>
 
-          {/* Iniciar Sesión Destacado */}
+          {/* Iniciar Sesión */}
           <button
             type="button"
             className="btn btn-sm ms-2 px-3 py-2 fw-bold"
