@@ -2,39 +2,32 @@
 
 Plataforma web desarrollada en **React** que permite a los usuarios seleccionar componentes de hardware de alto rendimiento, consultar el catálogo disponible y calcular en tiempo real el consumo energético total (Watts), la fuente de poder recomendada y el desglose de precios con IVA.
 
-
-
-> 🌐 **Demo en vivo desplegada en Vercel:** [https://fullstack2026-uh7v.vercel.app/](https://fullstack2026-uh7v.vercel.app/)
+> 🌐 **Demo en vivo desplegada en Vercel:** [https://desarrollo-fullstack2.vercel.app/](https://desarrollo-fullstack2.vercel.app/)
 
 ---
 
-## 👥 Integrantes del Equipo
-* **Joaquín Ferrada**
-* **Maximiliano Veas**
-* **Dylan Navarrete**
+## 🚀 Características Principales
+
+* **🛒 Catálogo Dinámico de Productos**: Exploración de componentes de hardware (Procesadores, Tarjetas de Video, Memorias RAM, etc.) con stock disponible, imágenes y precios formateados en CLP.
+* **🔧 Armador de PC & Calculadora de Watts**: Selección interactiva de componentes con cálculo automático de consumo eléctrico total y sugerencia de fuente de poder recomendada (+100W de margen de seguridad).
+* **📦 Carrito de Compras Persistente**: Gestión de cantidades, vaciado e integración global mediante `localStorage` para conservar la selección al recargar la página.
+* **🧾 Cálculo Financiero Formal**: Desglose automático de Subtotal Neto, IVA (19%) y Total Final en pesos chilenos ($CLP) modularizado en `formato.js`.
+* **📑 Historial de Cotizaciones**: Almacenamiento local de presupuestos armados con la capacidad de recargarlos directamente al carrito de compras con un clic.
+* **🔒 Checkout & Autenticación**: Redirección fluida desde la confirmación de compra hacia la vista de inicio de sesión (`Auth`).
 
 ---
 
-## 🚀 Tecnologías Utilizadas
-* **Frontend**: React 18, Vite
-* **Estilos**: Bootstrap 5, Custom CSS (Tema Dark `#0B0F19` / `#00FF66`)
-* **Testing Unitario**: Vitest
-* **Control de Versiones**: Git & GitHub
+## 🛠️ Tecnologías Utilizadas
+
+* **Frontend**: React.js, JavaScript (ES6+)
+* **Estilos & UI**: Bootstrap 5, CSS3 Custom Properties (Tema Dark/Neón)
+* **Persistencia**: LocalStorage API
+* **Despliegue**: Vercel
 
 ---
 
-## 🛠️ Estructura del Proyecto
+## ⚙️ Instalación y Ejecución Local
 
-```text
-src/
-├── components/          # Componentes de interfaz (UI)
-│   ├── basicos/         # Footer, Navbar
-│   ├── estado/          # CalculadoraWatts (Armador Interactivo)
-│   └── props/           # ListaProductos, TarjetaProducto
-├── logica/              # Módulos de lógica de negocio pura
-│   ├── armador.js       # Suma de watts y cálculo de fuente recomendada
-│   ├── datos.js         # Inventario y catálogo de componentes
-│   ├── formato.js       # Formateo CLP y cálculo de IVA
-│   └── *.spec.js        # Cobertura de pruebas unitarias
-├── pages/               # Vistas principales (Inicio, Catalogo, Armador)
-└── App.jsx              # Enrutamiento y estructura global
+1. **Clonar el repositorio:**
+   ```bash
+   git clone [https://github.com/dylan2771/fullstack2.git](https://github.com/dylan2771/fullstack2.git)
