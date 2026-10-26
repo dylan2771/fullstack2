@@ -2,18 +2,22 @@
 import React from 'react';
 import { formatearCLP } from '../../logica/formato';
 
-export const TarjetaProducto = ({ producto, onAgregar }) => {
-  if (!producto) return null;
+export const TarjetaProducto = (props) => {
+  // Soporta recibir la prop como 'producto' o como props individuales destructuradas
+  const prod = props.producto || props;
+  const { id, nombre, precio, watts, imagen, categoria, onAgregar } = props.producto 
+    ? { ...props.producto, onAgregar: props.onAgregar } 
+    : props;
 
-  const { id, nombre, precio, watts, imagen, categoria } = producto;
+  if (!nombre) return null;
 
   const handleAgregar = () => {
     if (onAgregar) {
       onAgregar({
-        id,
+        id: String(id || Date.now()),
         nombre,
-        precio,
-        watts,
+        precio: Number(precio) || 0,
+        watts: Number(watts) || 0,
         imagen,
         cantidad: 1
       });
@@ -30,7 +34,7 @@ export const TarjetaProducto = ({ producto, onAgregar }) => {
           src={imagen} 
           alt={nombre} 
           className="card-img-top rounded mb-3"
-          style={{ height: '180px', objectFit: 'contain', backgroundColor: '#080C14', padding: '10px' }}
+          style={{ height: '180px', objectFit: 'cover', backgroundColor: '#080C14' }}
         />
       )}
 
@@ -42,12 +46,12 @@ export const TarjetaProducto = ({ producto, onAgregar }) => {
             </span>
           )}
           <h5 className="card-title fw-bold text-white mb-2">{nombre}</h5>
-          {watts && <p className="text-muted small mb-2">⚡ Consumo: {watts}W</p>}
+          {watts !== undefined && <p className="text-muted small mb-2">⚡ Consumo: {watts}W</p>}
         </div>
 
         <div className="mt-3">
           <div className="fs-4 fw-bold text-success mb-3">
-            {formatearCLP(precio)}
+            {formatearCLP ? formatearCLP(precio) : `$${Number(precio).toLocaleString('es-CL')}`}
           </div>
 
           <button
@@ -56,8 +60,7 @@ export const TarjetaProducto = ({ producto, onAgregar }) => {
             style={{ 
               backgroundColor: '#00FF66', 
               border: 'none',
-              borderRadius: '6px',
-              transition: 'all 0.2s ease'
+              borderRadius: '6px'
             }}
             onClick={handleAgregar}
           >
