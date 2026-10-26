@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './styles/Utilidades.css';
 import './App.css';
 
+import { CarritoModal } from './components/basicos/CarritoModal';
 import { Navbar } from './components/basicos/Navbar';
 import { Footer } from './components/basicos/Footer';
 
