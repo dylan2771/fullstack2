@@ -1,4 +1,4 @@
-export const Navbar = ({ setVista, vistaActual = 'inicio' }) => {
+export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpenCarrito }) => {
   const opciones = [
     { id: 'inicio', label: 'Inicio' },
     { id: 'catalogo', label: 'Catálogo' },
@@ -49,6 +49,30 @@ export const Navbar = ({ setVista, vistaActual = 'inicio' }) => {
               </button>
             );
           })}
+
+          {/* Botón Carrito de Compras */}
+          <button
+            type="button"
+            className="btn btn-sm position-relative ms-1 px-3 py-2 fw-bold"
+            style={{
+              backgroundColor: '#111827',
+              color: '#00FF66',
+              border: '1px solid #00FF66',
+              borderRadius: '6px',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={onOpenCarrito}
+          >
+            🛒 Carrito
+            {totalItems > 0 && (
+              <span 
+                className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                style={{ backgroundColor: '#00FF66', color: '#000000', fontSize: '0.75rem' }}
+              >
+                {totalItems}
+              </span>
+            )}
+          </button>
 
           {/* Iniciar Sesión Destacado */}
           <button
