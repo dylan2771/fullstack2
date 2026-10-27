@@ -5,6 +5,7 @@ export const productos = [
     precio: 329990,
     watts: 170,
     categoria: "GAMER",
+    stock: 25,
     imagen: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80"
   },
   {
@@ -13,7 +14,8 @@ export const productos = [
     precio: 449990,
     watts: 120,
     categoria: "GAMER",
-    imagen: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80"
+    stock: 15,
+    imagen: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "3",
@@ -21,7 +23,8 @@ export const productos = [
     precio: 699990,
     watts: 220,
     categoria: "GAMER",
-    imagen: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80"
+    stock: 10,
+    imagen: "https://www.hardwareluxx.de/images/cdn02/uploads/2023/Apr/timely_controller_gn/nvidia-geforce-rtx-4070-fe-00002_1920px.jpg"
   },
   {
     id: "4",
@@ -29,7 +32,8 @@ export const productos = [
     precio: 629990,
     watts: 253,
     categoria: "WORKSTATION",
-    imagen: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80"
+    stock: 8,
+    imagen: "https://www.muycomputer.com/wp-content/uploads/2023/09/Intel-1.jpg"
   },
   {
     id: "5",
@@ -37,7 +41,8 @@ export const productos = [
     precio: 1899900,
     watts: 450,
     categoria: "WORKSTATION",
-    imagen: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"
+    stock: 5,
+    imagen: "https://www.winpy.cl/files/36915-3331-ASUS-ROG-Strix-GeForce-RTX-4090-24G-1.jpg"
   },
   {
     id: "6",
@@ -45,6 +50,7 @@ export const productos = [
     precio: 129990,
     watts: 15,
     categoria: "GAMER",
+    stock: 30,
     imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=800&q=80"
   },
   {
@@ -53,6 +59,7 @@ export const productos = [
     precio: 45990,
     watts: 10,
     categoria: "OFICINA",
+    stock: 40,
     imagen: "https://images.unsplash.com/photo-1541029071515-84cc54f84dc5?auto=format&fit=crop&w=800&q=80"
   }
 ];

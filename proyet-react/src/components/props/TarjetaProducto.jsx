@@ -1,73 +1,98 @@
-// src/components/props/TarjetaProducto.jsx
-import React from 'react';
-import { formatearCLP } from '../../logica/formato';
+import React, { useState } from 'react';
 
-export const TarjetaProducto = (props) => {
-  // Soporta recibir la prop como 'producto' o como props individuales destructuradas
-  const prod = props.producto || props;
-  const { id, nombre, precio, watts, imagen, categoria, onAgregar } = props.producto 
-    ? { ...props.producto, onAgregar: props.onAgregar } 
-    : props;
+export function TarjetaProducto({ producto, agregarAlCarrito }) {
+  // Manejamos el valor como string para permitir borrar el 1 y escribir números de 2 cifras libremente
+  const [cantidad, setCantidad] = useState("1");
 
-  if (!nombre) return null;
+  const handleChange = (e) => {
+    const val = e.target.value;
 
-  const handleAgregar = () => {
-    if (onAgregar) {
-      onAgregar({
-        id: String(id || Date.now()),
-        nombre,
-        precio: Number(precio) || 0,
-        watts: Number(watts) || 0,
-        imagen,
-        cantidad: 1
-      });
+    // Permite borrar todo el campo sin forzar el 1 de inmediato
+    if (val === "") {
+      setCantidad("");
+      return;
+    }
+
+    const num = parseInt(val, 10);
+    if (!isNaN(num)) {
+      if (producto.stock && num > producto.stock) {
+        setCantidad(producto.stock.toString());
+      } else {
+        setCantidad(num.toString());
+      }
     }
   };
 
+  const handleBlur = () => {
+    // Si el usuario deja el campo vacío o coloca 0/negativo, al salir del campo vuelve a 1
+    const num = parseInt(cantidad, 10);
+    if (isNaN(num) || num < 1) {
+      setCantidad("1");
+    }
+  };
+
+  const handleAgregar = () => {
+    const numFinal = parseInt(cantidad, 10);
+    const cantidadAñadir = !isNaN(numFinal) && numFinal >= 1 ? numFinal : 1;
+    
+    // Ejecuta la función del carrito pasando el producto y la cantidad numérica procesada
+    agregarAlCarrito(producto, cantidadAñadir);
+  };
+
   return (
-    <div 
-      className="card h-100 p-3 text-white border-secondary shadow-sm" 
-      style={{ backgroundColor: '#111827', borderRadius: '10px' }}
-    >
-      {imagen && (
-        <img 
-          src={imagen} 
-          alt={nombre} 
-          className="card-img-top rounded mb-3"
-          style={{ height: '180px', objectFit: 'cover', backgroundColor: '#080C14' }}
-        />
-      )}
+    <div className="card bg-dark text-white border-secondary h-100 p-3 shadow-sm">
+      <img
+        src={producto.imagen}
+        alt={producto.nombre}
+        className="card-img-top rounded mb-3"
+        style={{ height: '180px', objectFit: 'cover' }}
+      />
 
       <div className="card-body d-flex flex-column justify-content-between p-0">
         <div>
-          {categoria && (
-            <span className="badge bg-secondary mb-2 text-uppercase" style={{ fontSize: '0.7rem' }}>
-              {categoria}
-            </span>
-          )}
-          <h5 className="card-title fw-bold text-white mb-2">{nombre}</h5>
-          {watts !== undefined && <p className="text-muted small mb-2">⚡ Consumo: {watts}W</p>}
-        </div>
+          <span className="badge bg-secondary mb-2">{producto.categoria}</span>
+          <h5 className="card-title text-white fs-6 fw-bold mb-2">{producto.nombre}</h5>
 
-        <div className="mt-3">
-          <div className="fs-4 fw-bold text-success mb-3">
-            {formatearCLP ? formatearCLP(precio) : `$${Number(precio).toLocaleString('es-CL')}`}
+          {/* Consumo visible en blanco */}
+          <p className="text-white fw-bold mb-2 small">
+            ⚡ Consumo: <span className="text-white fs-6">{producto.watts}W</span>
+          </p>
+
+          <p className="text-success fw-bold fs-5 mb-2">
+            ${producto.precio?.toLocaleString('es-CL')}
+          </p>
+
+          {/* Stock e Input que permite borrar y tipear 20 */}
+          <div className="d-flex align-items-center justify-content-between my-2 bg-black bg-opacity-25 p-2 rounded border border-secondary-subtle">
+            <small className="text-white">
+              Stock: <strong className="text-success">{producto.stock ?? 20} un.</strong>
+            </small>
+
+            <div className="d-flex align-items-center gap-1">
+              <label htmlFor={`cant-${producto.id}`} className="small text-white me-1">Cant:</label>
+              <input
+                id={`cant-${producto.id}`}
+                type="number"
+                min="1"
+                max={producto.stock ?? 99}
+                value={cantidad}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="form-control bg-dark text-white border-secondary text-center p-1"
+                style={{ width: '70px', fontSize: '14px', fontWeight: 'bold' }}
+              />
+            </div>
           </div>
-
-          <button
-            type="button"
-            className="btn w-100 fw-bold text-dark d-flex align-items-center justify-content-center gap-2"
-            style={{ 
-              backgroundColor: '#00FF66', 
-              border: 'none',
-              borderRadius: '6px'
-            }}
-            onClick={handleAgregar}
-          >
-            🛒 Añadir al Carrito
-          </button>
         </div>
+
+        <button
+          onClick={handleAgregar}
+          disabled={producto.stock === 0}
+          className="btn btn-success w-100 fw-bold mt-3"
+        >
+          {producto.stock === 0 ? "Agotado" : "🛒 Añadir al Carrito"}
+        </button>
       </div>
     </div>
   );
-};
+}

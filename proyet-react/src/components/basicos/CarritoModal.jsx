@@ -55,12 +55,43 @@ export function CarritoModal({
                       </div>
 
                       <div className="d-flex align-items-center gap-2">
-                        <div className="btn-group border border-secondary rounded">
-                          <button className="btn btn-sm text-white px-2" onClick={() => onCantidad(item.id, item.cantidad - 1)}>-</button>
-                          <span className="btn btn-sm text-white px-3 fw-bold disabled" style={{ backgroundColor: '#111827' }}>{item.cantidad}</span>
-                          <button className="btn btn-sm text-white px-2" onClick={() => onCantidad(item.id, item.cantidad + 1)}>+</button>
+                        {/* Selector de cantidad con entrada manual e incremento */}
+                        <div className="d-flex align-items-center gap-1">
+                          <button 
+                            className="btn btn-sm btn-outline-secondary text-white px-2" 
+                            onClick={() => onCantidad(item.id, Math.max(1, item.cantidad - 1))}
+                          >
+                            -
+                          </button>
+                          
+                          <input
+                            type="number"
+                            min="1"
+                            max={item.stock || 99}
+                            value={item.cantidad}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              if (!isNaN(val) && val >= 1) {
+                                onCantidad(item.id, val);
+                              }
+                            }}
+                            className="form-control bg-dark text-white border-secondary text-center p-1"
+                            style={{ width: '60px', fontSize: '14px', fontWeight: 'bold' }}
+                          />
+
+                          <button 
+                            className="btn btn-sm btn-outline-secondary text-white px-2" 
+                            onClick={() => onCantidad(item.id, item.cantidad + 1)}
+                          >
+                            +
+                          </button>
                         </div>
-                        <span className="fw-bold ms-2 text-success me-3">{formatearCLP(item.precio * item.cantidad)}</span>
+
+                        {/* Multiplicación limpia del Subtotal */}
+                        <span className="fw-bold ms-2 text-success me-3">
+                          {formatearCLP(item.precio * item.cantidad)}
+                        </span>
+                        
                         <button className="btn btn-sm btn-outline-danger border-0" onClick={() => onEliminar(item.id)}>🗑️</button>
                       </div>
                     </li>

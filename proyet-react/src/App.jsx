@@ -21,7 +21,7 @@ import {
 export function App() {
   const [vistaActual, setVistaActual] = useState('inicio');
 
-  // Carga inicial respaldada desde localStorage para no perder los productos al recargar
+  // Carga inicial respaldada desde localStorage
   const [carrito, setCarrito] = useState(() => {
     try {
       const guardado = localStorage.getItem('buildmypc_carrito');
@@ -33,7 +33,7 @@ export function App() {
 
   const [showCarrito, setShowCarrito] = useState(false);
 
-  // Guarda automáticamente en localStorage ante cualquier cambio en el carrito
+  // Guarda automáticamente en localStorage ante cualquier cambio
   useEffect(() => {
     try {
       localStorage.setItem('buildmypc_carrito', JSON.stringify(carrito));
@@ -42,10 +42,11 @@ export function App() {
     }
   }, [carrito]);
 
-  // Manejadores con validaciones
-  const handleAgregarAlCarrito = (producto) => {
+  // Manejadores con soporte para cantidad (ej. ingresar 20 o 30 unidades)
+  const handleAgregarAlCarrito = (producto, cantidad = 1) => {
     if (!producto || !producto.id) return;
-    setCarrito((prev) => agregarAlCarrito(prev, producto));
+    const numCantidad = Number(cantidad) || 1;
+    setCarrito((prev) => agregarAlCarrito(prev, producto, numCantidad));
   };
 
   const handleEliminarDelCarrito = (id) => {
