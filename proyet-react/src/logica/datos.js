@@ -1,59 +1,58 @@
-// src/logica/datos.js
 export const productos = [
   {
     id: "1",
-    nombre: "Procesador Intel Core i5-13400F",
-    watts: 65,
-    precio: 189990,
-    categoria: "Oficina",
-    imagen: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=600&auto=format&fit=crop"
+    nombre: "Tarjeta de Video NVIDIA RTX 3060 12GB",
+    precio: 329990,
+    watts: 170,
+    categoria: "GAMER",
+    imagen: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "2",
-    nombre: "Tarjeta de Video NVIDIA RTX 3060 12GB",
-    watts: 170,
-    precio: 329990,
-    categoria: "Gamer",
-    imagen: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=600&auto=format&fit=crop"
+    nombre: "Procesador AMD Ryzen 7 7800X3D",
+    precio: 449990,
+    watts: 120,
+    categoria: "GAMER",
+    imagen: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "3",
-    nombre: "Procesador AMD Ryzen 7 7800X3D",
-    watts: 120,
-    precio: 449990,
-    categoria: "Gamer",
-    imagen: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop"
+    nombre: "Tarjeta de Video NVIDIA RTX 4070 Super 12GB",
+    precio: 699990,
+    watts: 220,
+    categoria: "GAMER",
+    imagen: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "4",
-    nombre: "Tarjeta de Video NVIDIA RTX 4070 Super 12GB",
-    watts: 220,
-    precio: 699990,
-    categoria: "Gamer",
-    imagen: "https://images.unsplash.com/photo-1587202372605-59265f24f114?q=80&w=600&auto=format&fit=crop"
+    nombre: "Procesador Intel Core i9-14900K",
+    precio: 629990,
+    watts: 253,
+    categoria: "WORKSTATION",
+    imagen: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "5",
-    nombre: "Procesador Intel Core i9-14900K",
-    watts: 253,
-    precio: 629990,
-    categoria: "Workstation",
-    imagen: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?q=80&w=600&auto=format&fit=crop"
+    nombre: "Tarjeta de Video NVIDIA RTX 4090 24GB",
+    precio: 1899900,
+    watts: 450,
+    categoria: "WORKSTATION",
+    imagen: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "6",
-    nombre: "Tarjeta de Video NVIDIA RTX 4090 24GB",
-    watts: 450,
-    precio: 1899990,
-    categoria: "Workstation",
-    imagen: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=600&auto=format&fit=crop"
+    nombre: "Memoria RAM Corsair Vengeance DDR5 32GB (2x16GB)",
+    precio: 129990,
+    watts: 15,
+    categoria: "GAMER",
+    imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "7",
-    nombre: "Kit Memoria RAM DDR5 32GB (2x16GB)",
-    watts: 15,
-    precio: 129990,
-    categoria: "Gamer",
-    imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=600&auto=format&fit=crop"
+    nombre: "Memoria RAM Kingston FURY Beast DDR4 16GB",
+    precio: 45990,
+    watts: 10,
+    categoria: "OFICINA",
+    imagen: "https://images.unsplash.com/photo-1541029071515-84cc54f84dc5?auto=format&fit=crop&w=800&q=80"
   }
 ];
