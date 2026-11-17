@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FormLogin } from '../components/formularios/FormLogin';
 import { FormRegistro } from '../components/formularios/FormRegistro';
 
-export const Auth = ({ onLogin }) => {
+export const Auth = ({ onLogin, mensajeAviso }) => {
   const [esLogin, setEsLogin] = useState(true);
 
   return (
@@ -17,6 +17,19 @@ export const Auth = ({ onLogin }) => {
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)'
         }}
       >
+        {mensajeAviso && (
+          <div 
+            className="alert p-3 mb-3 rounded small fw-bold text-center"
+            style={{ 
+              backgroundColor: 'rgba(245, 158, 11, 0.15)', 
+              border: '1px solid #F59E0B', 
+              color: '#FBBF24' 
+            }}
+          >
+            🔒 {mensajeAviso}
+          </div>
+        )}
+
         <h2 className="text-center fw-bold mb-2" style={{ color: '#00FF66' }}>
           Autenticación de Usuario
         </h2>
