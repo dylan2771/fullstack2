@@ -1,9 +1,10 @@
-export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpenCarrito }) => {
+export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpenCarrito, usuario, onLogout }) => {
   const opciones = [
     { id: 'inicio', label: 'Inicio' },
     { id: 'catalogo', label: 'Catálogo' },
     { id: 'armador', label: 'Armador' },
     { id: 'cotizaciones', label: 'Cotizaciones' },
+    ...(usuario ? [{ id: 'pedidos', label: 'Mis Pedidos' }] : []),
   ];
 
   return (
@@ -15,7 +16,7 @@ export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpe
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.6)'
       }}
     >
-      <div className="container d-flex align-items-center justify-content-between p-0">
+      <div className="container d-flex flex-wrap align-items-center justify-content-between gap-2 p-0">
         {/* Logo Gamer */}
         <div 
           className="d-flex align-items-center gap-2" 
@@ -28,7 +29,7 @@ export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpe
         </div>
 
         {/* Navegación y Botones */}
-        <nav className="d-flex align-items-center gap-2">
+        <nav className="d-flex flex-wrap align-items-center gap-2">
           {opciones.map((item) => {
             const esActivo = vistaActual === item.id;
             return (
@@ -50,10 +51,10 @@ export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpe
             );
           })}
 
-          {/* Botón Carrito con animación y badge notificadora */}
+          {/* Botón Carrito */}
           <button
             type="button"
-            className="btn btn-sm position-relative ms-2 px-3 py-2 fw-bold d-flex align-items-center gap-2"
+            className="btn btn-sm position-relative px-3 py-2 fw-bold d-flex align-items-center gap-2"
             style={{
               backgroundColor: totalItems > 0 ? '#00FF66' : '#111827',
               color: totalItems > 0 ? '#000000' : '#00FF66',
@@ -75,21 +76,32 @@ export const Navbar = ({ setVista, vistaActual = 'inicio', totalItems = 0, onOpe
             )}
           </button>
 
-          {/* Iniciar Sesión */}
-          <button
-            type="button"
-            className="btn btn-sm ms-2 px-3 py-2 fw-bold"
-            style={{
-              backgroundColor: vistaActual === 'login' || vistaActual === 'auth' ? '#00FF66' : '#111827',
-              color: vistaActual === 'login' || vistaActual === 'auth' ? '#000000' : '#00FF66',
-              border: '1px solid #00FF66',
-              borderRadius: '6px',
-              transition: 'all 0.2s ease'
-            }}
-            onClick={() => setVista('login')}
-          >
-            Iniciar Sesión
-          </button>
+          {/* Iniciar / Cerrar Sesión */}
+          {usuario ? (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-danger px-3 py-2 fw-bold"
+              style={{ borderRadius: '6px' }}
+              onClick={onLogout}
+            >
+              Cerrar Sesión ({usuario.nombre})
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-sm px-3 py-2 fw-bold"
+              style={{
+                backgroundColor: vistaActual === 'login' || vistaActual === 'auth' ? '#00FF66' : '#111827',
+                color: vistaActual === 'login' || vistaActual === 'auth' ? '#000000' : '#00FF66',
+                border: '1px solid #00FF66',
+                borderRadius: '6px',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={() => setVista('login')}
+            >
+              Iniciar Sesión
+            </button>
+          )}
         </nav>
       </div>
     </header>

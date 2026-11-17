@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { validarLogin } from '../../logica/validaciones';
 
-export const FormLogin = () => {
+export const FormLogin = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errores, setErrores] = useState([]);
@@ -18,7 +18,13 @@ export const FormLogin = () => {
     }
 
     setErrores([]);
-    alert('¡Inicio de sesión exitoso!');
+
+    // Extrae el nombre de usuario desde el correo y notifica a App.jsx
+    const nombreUsuario = email.split('@')[0];
+    if (typeof onLogin === 'function') {
+      onLogin(nombreUsuario);
+    }
+
     // Limpia el formulario
     setEmail('');
     setPassword('');

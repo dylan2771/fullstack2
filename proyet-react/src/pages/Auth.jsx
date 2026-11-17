@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { FormLogin } from '../components/formularios/FormLogin';
 import { FormRegistro } from '../components/formularios/FormRegistro';
 
-export const Auth = () => {
-  // Estado para alternar entre vista de Login (true) y Registro (false)
+export const Auth = ({ onLogin }) => {
   const [esLogin, setEsLogin] = useState(true);
 
   return (
@@ -18,7 +17,6 @@ export const Auth = () => {
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)'
         }}
       >
-        {/* Encabezado */}
         <h2 className="text-center fw-bold mb-2" style={{ color: '#00FF66' }}>
           Autenticación de Usuario
         </h2>
@@ -26,7 +24,6 @@ export const Auth = () => {
           {esLogin ? 'Ingresa tus credenciales para acceder' : 'Crea tu cuenta para guardar tus cotizaciones'}
         </p>
 
-        {/* Pestañas de Selección */}
         <div className="d-flex rounded p-1 mb-4" style={{ backgroundColor: '#0B0F19', border: '1px solid #1F2937' }}>
           <button 
             type="button" 
@@ -58,9 +55,8 @@ export const Auth = () => {
           </button>
         </div>
 
-        {/* Carga del formulario activo */}
         <div className="seccion-formularios">
-          {esLogin ? <FormLogin /> : <FormRegistro />}
+          {esLogin ? <FormLogin onLogin={onLogin} /> : <FormRegistro />}
         </div>
       </div>
     </main>

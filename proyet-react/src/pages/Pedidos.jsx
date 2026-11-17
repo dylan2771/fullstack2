@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatearCLP } from '../logica/formato';
 
-export function Pedidos({ pedidos = [], onEliminarPedido }) {
+export function Pedidos({ pedidos = [], onEliminarPedido, usuario }) {
   const listaPedidos = Array.isArray(pedidos) ? pedidos : [];
 
   const formatearMonto = (monto) => {
@@ -11,12 +11,28 @@ export function Pedidos({ pedidos = [], onEliminarPedido }) {
     return `$${Number(monto || 0).toLocaleString('es-CL')}`;
   };
 
-  if (listaPedidos.length === 0) {
+  if (!usuario) {
+    return (
+      <main className="container py-5 text-center">
+        <div className="card p-5 bg-dark text-white border-secondary shadow-sm">
+          <div className="fs-1 mb-2">🔒</div>
+          <h3 className="fw-bold">Inicia sesión</h3>
+          <p className="text-secondary mb-0">
+            Debes iniciar sesión para ver tus cotizaciones guardadas.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  const misPedidos = listaPedidos.filter((pedido) => pedido.propietario === usuario.nombre);
+
+  if (misPedidos.length === 0) {
     return (
       <main className="container py-5 text-center">
         <div className="card p-5 bg-dark text-white border-secondary shadow-sm">
           <div className="fs-1 mb-2">📋</div>
-          <h3 className="fw-bold">No tienes pedidos registrados</h3>
+          <h3 className="fw-bold">No tienes pedidos registrados, {usuario.nombre}</h3>
           <p className="text-secondary mb-0">
             Tus compras confirmadas aparecerán en esta sección.
           </p>
@@ -27,9 +43,9 @@ export function Pedidos({ pedidos = [], onEliminarPedido }) {
 
   return (
     <main className="container py-5">
-      <h2 className="text-success fw-bold mb-4">📦 Pedidos Realizados</h2>
+      <h2 className="text-success fw-bold mb-4">📦 Pedidos de {usuario.nombre}</h2>
       <div className="d-flex flex-column gap-4">
-        {listaPedidos.map((pedido) => (
+        {misPedidos.map((pedido) => (
           <div
             key={pedido.id}
             className="card bg-dark text-white border-secondary p-4 shadow-sm"
@@ -95,5 +111,4 @@ export function Pedidos({ pedidos = [], onEliminarPedido }) {
   );
 }
 
-// 🟢 Exportación por defecto para evitar errores de importación
 export default Pedidos;

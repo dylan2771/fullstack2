@@ -3,9 +3,10 @@ import { productos } from '../../logica/datos';
 import { calcularConsumoTotalWatts, obtenerFuenteRecomendadaWatts } from '../../logica/armador';
 import { formatearCLP, calcularIVA, calcularTotalConIVA } from '../../logica/formato';
 
-export const CalculadoraWatts = () => {
+export const CalculadoraWatts = ({ onGuardarCotizacion }) => {
   const [seleccionados, setSeleccionados] = useState([]);
   const [categoriaFiltro, setCategoriaFiltro] = useState('Todas');
+  const [nombreCotizacion, setNombreCotizacion] = useState('');
   const [mensajeCopiado, setMensajeCopiado] = useState(false);
 
   // Filtrado de productos
@@ -45,6 +46,24 @@ export const CalculadoraWatts = () => {
     setTimeout(() => setMensajeCopiado(false), 2500);
   };
 
+  // Guardar cotización en el perfil del usuario
+  const handleGuardar = () => {
+    if (seleccionados.length === 0 || typeof onGuardarCotizacion !== 'function') return;
+
+    onGuardarCotizacion({
+      titulo: nombreCotizacion.trim() || 'Armado PC Personalizado',
+      items: seleccionados,
+      totalWatts,
+      fuenteRecomendada,
+      subtotal: subtotalPrecio,
+      iva: ivaCalculado,
+      totalFinal: totalConIVA,
+    });
+
+    setNombreCotizacion('');
+    setSeleccionados([]);
+  };
+
   return (
     <section className="container py-2 text-start">
       {/* 1. Encabezado de Control y Filtros */}
@@ -59,6 +78,7 @@ export const CalculadoraWatts = () => {
             {['Todas', 'Gamer', 'Workstation', 'Oficina'].map((cat) => (
               <button
                 key={cat}
+                type="button"
                 onClick={() => setCategoriaFiltro(cat)}
                 className={`btn btn-sm fw-bold ${categoriaFiltro === cat ? 'btn-success' : 'btn-outline-secondary'}`}
                 style={categoriaFiltro === cat ? { backgroundColor: '#00FF66', color: '#000', border: 'none' } : { borderRadius: '6px' }}
@@ -123,7 +143,7 @@ export const CalculadoraWatts = () => {
 
         {/* 3. Panel Lateral de Resumen Energético y Presupuesto */}
         <div className="col-lg-5 col-xl-4">
-          <div className="card p-4 text-white shadow" style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px', sticky: 'top' }}>
+          <div className="card p-4 text-white shadow" style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px', position: 'sticky', top: '90px' }}>
             <h5 className="fw-bold mb-3 d-flex justify-content-between align-items-center" style={{ color: '#00FF66' }}>
               <span>⚡ Resumen del Armado</span>
               <span className="badge bg-dark border border-secondary text-white fs-6">
@@ -181,22 +201,49 @@ export const CalculadoraWatts = () => {
                 <span>IVA (19%):</span>
                 <span>{formatearCLP(ivaCalculado)}</span>
               </div>
-              <div className="d-flex justify-content-between align-items-center mb-4 pt-2 border-top border-secondary">
+              <div className="d-flex justify-content-between align-items-center mb-3 pt-2 border-top border-secondary">
                 <span className="fw-bold fs-6">Total Final:</span>
                 <span className="fw-bold fs-4 text-white">{formatearCLP(totalConIVA)}</span>
               </div>
             </div>
 
+            {/* Nombre opcional de la cotización */}
+            {typeof onGuardarCotizacion === 'function' && (
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control form-control-sm text-white"
+                  style={{ backgroundColor: '#0B0F19', border: '1px solid #1F2937', borderRadius: '6px' }}
+                  placeholder="Nombre de tu PC (Ej: PC Gamer)"
+                  value={nombreCotizacion}
+                  onChange={(e) => setNombreCotizacion(e.target.value)}
+                />
+              </div>
+            )}
+
             {/* Botones de Acción Estructurados */}
             <div className="d-grid gap-2">
+              {typeof onGuardarCotizacion === 'function' && (
+                <button 
+                  type="button"
+                  className="btn fw-bold py-2 shadow-sm" 
+                  style={{ 
+                    backgroundColor: seleccionados.length > 0 ? '#00FF66' : '#1F2937', 
+                    color: seleccionados.length > 0 ? '#000' : '#6C757D', 
+                    border: 'none',
+                    borderRadius: '8px' 
+                  }}
+                  disabled={seleccionados.length === 0}
+                  onClick={handleGuardar}
+                >
+                  💾 Guardar Cotización
+                </button>
+              )}
+
               <button 
-                className="btn fw-bold py-2 shadow-sm" 
-                style={{ 
-                  backgroundColor: seleccionados.length > 0 ? '#00FF66' : '#1F2937', 
-                  color: seleccionados.length > 0 ? '#000' : '#6C757D', 
-                  border: 'none',
-                  borderRadius: '8px' 
-                }}
+                type="button"
+                className="btn btn-outline-success fw-bold py-2" 
+                style={{ borderRadius: '8px' }}
                 disabled={seleccionados.length === 0}
                 onClick={copiarResumen}
               >
@@ -205,6 +252,7 @@ export const CalculadoraWatts = () => {
 
               {seleccionados.length > 0 && (
                 <button 
+                  type="button"
                   className="btn btn-outline-danger btn-sm py-2 fw-semibold"
                   style={{ borderRadius: '8px' }}
                   onClick={() => setSeleccionados([])}

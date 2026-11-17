@@ -12,6 +12,7 @@ import { Catalogo } from './pages/Catalogo';
 import { Armador } from './pages/Armador';
 import { Auth } from './pages/Auth';
 import { Pedidos } from './pages/Pedidos';
+import { Cotizaciones } from './pages/cotizaciones';
 
 import { 
   agregarAlCarrito, 
@@ -24,6 +25,17 @@ export function App() {
   const [vistaActual, setVistaActual] = useState('inicio');
   const [showCarrito, setShowCarrito] = useState(false);
   const [showPago, setShowPago] = useState(false);
+  const [pendientePago, setPendientePago] = useState(false);
+
+  // Sesión de usuario respaldada en localStorage
+  const [usuario, setUsuario] = useState(() => {
+    try {
+      const guardado = localStorage.getItem('buildmypc_sesion');
+      return guardado ? JSON.parse(guardado) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Carrito respaldado en localStorage
   const [carrito, setCarrito] = useState(() => {
@@ -45,6 +57,11 @@ export function App() {
     }
   });
 
+  // Subir al inicio de la página al cambiar de vista
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [vistaActual]);
+
   // Guardado automático del carrito
   useEffect(() => {
     try {
@@ -62,6 +79,37 @@ export function App() {
       console.error('Error al guardar los pedidos:', e);
     }
   }, [pedidos]);
+
+  // Navegación controlada
+  const handleNavegar = (nuevaVista) => {
+    if (nuevaVista !== 'login' && nuevaVista !== 'auth') {
+      setPendientePago(false);
+    }
+    setVistaActual(nuevaVista);
+  };
+
+  // Iniciar sesión y continuar flujo pendiente o ir a Cotizaciones
+  const handleLogin = (nombreUsuario) => {
+    const datosUsuario = { nombre: nombreUsuario };
+    setUsuario(datosUsuario);
+    localStorage.setItem('buildmypc_sesion', JSON.stringify(datosUsuario));
+
+    if (pendientePago) {
+      setPendientePago(false);
+      setVistaActual('inicio');
+      setShowPago(true);
+    } else {
+      setVistaActual('cotizaciones');
+    }
+  };
+
+  // Cerrar sesión y volver al inicio
+  const handleLogout = () => {
+    setUsuario(null);
+    setPendientePago(false);
+    localStorage.removeItem('buildmypc_sesion');
+    setVistaActual('inicio');
+  };
 
   // Manejadores del carrito
   const handleAgregarAlCarrito = (producto, cantidad = 1) => {
@@ -82,14 +130,24 @@ export function App() {
     setCarrito([]);
   };
 
-  // Flujo de pago y pedidos
+  // Flujo de pago protegido por sesión
   const handleIrAPagar = () => {
     setShowCarrito(false);
+    if (!usuario) {
+      setPendientePago(true);
+      setVistaActual('login');
+      return;
+    }
     setShowPago(true);
   };
 
   const handleConfirmarPago = (nuevoPedido) => {
-    setPedidos((prev) => [nuevoPedido, ...prev]);
+    const pedidoConPropietario = {
+      ...nuevoPedido,
+      propietario: usuario ? usuario.nombre : 'Invitado'
+    };
+
+    setPedidos((prev) => [pedidoConPropietario, ...prev]);
     setCarrito([]);
     setShowPago(false);
     setVistaActual('pedidos');
@@ -108,11 +166,27 @@ export function App() {
       case 'armador':
         return <Armador onAgregar={handleAgregarAlCarrito} />;
       case 'pedidos':
-        return <Pedidos pedidos={pedidos} onEliminarPedido={handleEliminarPedido} />;
+        return (
+          <Pedidos 
+            pedidos={pedidos} 
+            onEliminarPedido={handleEliminarPedido} 
+            usuario={usuario} 
+          />
+        );
       case 'cotizaciones':
       case 'login':
       case 'auth':
-        return <Auth />;
+        return usuario ? (
+          <Cotizaciones 
+            usuario={usuario} 
+            onAgregar={handleAgregarAlCarrito} 
+          />
+        ) : (
+          <Auth 
+            onLogin={handleLogin} 
+            mensajeAviso={pendientePago ? 'Inicia sesión para finalizar tu compra.' : null}
+          />
+        );
       default:
         return <Inicio onAgregar={handleAgregarAlCarrito} />;
     }
@@ -121,10 +195,12 @@ export function App() {
   return (
     <div className="app-container">
       <Navbar 
-        setVista={setVistaActual} 
+        setVista={handleNavegar} 
         vistaActual={vistaActual} 
         totalItems={contarTotalItems(carrito)}
         onOpenCarrito={() => setShowCarrito(true)}
+        usuario={usuario}
+        onLogout={handleLogout}
       />
 
       {renderizarVista()}
