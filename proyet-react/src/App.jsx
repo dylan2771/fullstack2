@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './styles/Utilidades.css';
 import './App.css';
 
+import { useAuth } from './auth/useAuth';
 import { CarritoModal } from './components/basicos/CarritoModal';
 import { PagoModal } from './components/basicos/PagoModal';
 import { Navbar } from './components/basicos/Navbar';
@@ -22,20 +23,13 @@ import {
 } from './logica/carrito';
 
 export function App() {
+  // Consumimos el usuario y la función logout desde el contexto global con JWT
+  const { usuario, logout } = useAuth();
+
   const [vistaActual, setVistaActual] = useState('inicio');
   const [showCarrito, setShowCarrito] = useState(false);
   const [showPago, setShowPago] = useState(false);
   const [pendientePago, setPendientePago] = useState(false);
-
-  // Sesión de usuario respaldada en localStorage
-  const [usuario, setUsuario] = useState(() => {
-    try {
-      const guardado = localStorage.getItem('buildmypc_sesion');
-      return guardado ? JSON.parse(guardado) : null;
-    } catch {
-      return null;
-    }
-  });
 
   // Carrito respaldado en localStorage
   const [carrito, setCarrito] = useState(() => {
@@ -88,12 +82,8 @@ export function App() {
     setVistaActual(nuevaVista);
   };
 
-  // Iniciar sesión y continuar flujo pendiente o ir a Cotizaciones
-  const handleLogin = (nombreUsuario) => {
-    const datosUsuario = { nombre: nombreUsuario };
-    setUsuario(datosUsuario);
-    localStorage.setItem('buildmypc_sesion', JSON.stringify(datosUsuario));
-
+  // Qué hacer cuando el login es exitoso
+  const handleLoginExitoso = () => {
     if (pendientePago) {
       setPendientePago(false);
       setVistaActual('inicio');
@@ -103,11 +93,10 @@ export function App() {
     }
   };
 
-  // Cerrar sesión y volver al inicio
+  // Cerrar sesión limpiando el token global
   const handleLogout = () => {
-    setUsuario(null);
+    logout();
     setPendientePago(false);
-    localStorage.removeItem('buildmypc_sesion');
     setVistaActual('inicio');
   };
 
@@ -144,7 +133,7 @@ export function App() {
   const handleConfirmarPago = (nuevoPedido) => {
     const pedidoConPropietario = {
       ...nuevoPedido,
-      propietario: usuario ? usuario.nombre : 'Invitado'
+      propietario: usuario ? (usuario.nombre || usuario.email) : 'Invitado'
     };
 
     setPedidos((prev) => [pedidoConPropietario, ...prev]);
@@ -183,7 +172,7 @@ export function App() {
           />
         ) : (
           <Auth 
-            onLogin={handleLogin} 
+            onLogin={handleLoginExitoso} 
             mensajeAviso={pendientePago ? 'Inicia sesión para finalizar tu compra.' : null}
           />
         );
