@@ -1,4 +1,3 @@
-// src/pages/Cotizaciones.jsx
 import { useState, useEffect } from 'react';
 import { CalculadoraWatts } from '../components/estado/CalculadoraWatts';
 import { formatearCLP } from '../logica/formato';
@@ -58,11 +57,44 @@ export function Cotizaciones({ usuario, onAgregar }) {
     setTimeout(() => setMensajeExito(''), 3500);
   };
 
+  const handleDescargarTxt = (cot) => {
+    let contenido = "========================================\n";
+    contenido += "         BUILDMYPC - COTIZACIÓN         \n";
+    contenido += "========================================\n\n";
+    contenido += `ID Cotización: ${cot.id}\n`;
+    contenido += `Título: ${cot.titulo}\n`;
+    contenido += `Cliente: ${cot.propietario}\n`;
+    contenido += `Fecha: ${cot.fecha}\n`;
+    contenido += `Consumo Estimado: ${cot.totalWatts}W (Fuente recomendada: ${cot.fuenteRecomendada}W)\n\n`;
+    contenido += "----------------------------------------\n";
+    contenido += "DETALLE DE COMPONENTES:\n";
+    contenido += "----------------------------------------\n";
+
+    cot.items.forEach((item, index) => {
+      contenido += `${index + 1}. ${item.nombre} - ${formatearCLP(item.precio)}\n`;
+    });
+
+    contenido += "\n----------------------------------------\n";
+    contenido += `Subtotal: ${formatearCLP(cot.subtotal)}\n`;
+    contenido += `IVA (19%): ${formatearCLP(cot.iva)}\n`;
+    contenido += `TOTAL FINAL (c/IVA): ${formatearCLP(cot.totalFinal)}\n`;
+    contenido += "========================================\n";
+
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${cot.id}-${cot.titulo.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const misCotizaciones = cotizaciones.filter((c) => c.propietario === usuario.nombre);
 
   return (
     <main className="py-4">
-      {/* Encabezado */}
       <div className="container mb-3 text-start">
         <span
           className="badge mb-2 px-3 py-2 fw-bold"
@@ -87,10 +119,8 @@ export function Cotizaciones({ usuario, onAgregar }) {
         )}
       </div>
 
-      {/* Cotizador Interactivo */}
       <CalculadoraWatts onGuardarCotizacion={handleGuardarCotizacion} />
 
-      {/* Listado de Cotizaciones Guardadas del Usuario */}
       <section className="container mt-5 text-start">
         <h3 className="fw-bold mb-3 text-white">
           📋 Cotizaciones Guardadas de {usuario.nombre} ({misCotizaciones.length})
@@ -146,26 +176,37 @@ export function Cotizaciones({ usuario, onAgregar }) {
                     ))}
                   </ul>
 
-                  <div className="d-flex justify-content-between align-items-center pt-2 border-top border-secondary">
-                    <span className="small text-secondary">
-                      Neto: {formatearCLP(cot.subtotal)} + IVA: {formatearCLP(cot.iva)}
-                    </span>
-                    <div className="d-flex gap-2">
+                  <div className="d-flex flex-column gap-2 pt-2 border-top border-secondary">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="small text-secondary">
+                        Neto: {formatearCLP(cot.subtotal)} + IVA: {formatearCLP(cot.iva)}
+                      </span>
+                    </div>
+                    <div className="d-flex justify-content-between align-items-center">
                       <button
                         type="button"
-                        className="btn btn-sm fw-bold"
-                        style={{ backgroundColor: '#00FF66', color: '#000000' }}
-                        onClick={() => handlePasarAlCarrito(cot)}
+                        className="btn btn-sm btn-outline-light fw-bold"
+                        onClick={() => handleDescargarTxt(cot)}
                       >
-                        🛒 Al Carrito
+                        📄 Descargar .TXT
                       </button>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger fw-bold"
-                        onClick={() => handleEliminarCotizacion(cot.id)}
-                      >
-                        🗑️
-                      </button>
+                      <div className="d-flex gap-2">
+                        <button
+                          type="button"
+                          className="btn btn-sm fw-bold"
+                          style={{ backgroundColor: '#00FF66', color: '#000000' }}
+                          onClick={() => handlePasarAlCarrito(cot)}
+                        >
+                          🛒 Al Carrito
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger fw-bold"
+                          onClick={() => handleEliminarCotizacion(cot.id)}
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

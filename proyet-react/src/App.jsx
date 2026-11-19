@@ -1,3 +1,4 @@
+// src/App.jsx
 import { useState, useEffect } from 'react';
 import './styles/Utilidades.css';
 import './App.css';
@@ -23,13 +24,13 @@ import {
 } from './logica/carrito';
 
 export function App() {
-  // Consumimos el usuario y la función logout desde el contexto global con JWT
   const { usuario, logout } = useAuth();
 
   const [vistaActual, setVistaActual] = useState('inicio');
   const [showCarrito, setShowCarrito] = useState(false);
   const [showPago, setShowPago] = useState(false);
   const [pendientePago, setPendientePago] = useState(false);
+  const [montoPagoFinal, setMontoPagoFinal] = useState(null); // 👈 Nuevo estado para el total con cupón
 
   // Carrito respaldado en localStorage
   const [carrito, setCarrito] = useState(() => {
@@ -51,12 +52,10 @@ export function App() {
     }
   });
 
-  // Subir al inicio de la página al cambiar de vista
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [vistaActual]);
 
-  // Guardado automático del carrito
   useEffect(() => {
     try {
       localStorage.setItem('buildmypc_carrito', JSON.stringify(carrito));
@@ -65,7 +64,6 @@ export function App() {
     }
   }, [carrito]);
 
-  // Guardado automático de los pedidos
   useEffect(() => {
     try {
       localStorage.setItem('buildmypc_pedidos', JSON.stringify(pedidos));
@@ -74,7 +72,6 @@ export function App() {
     }
   }, [pedidos]);
 
-  // Navegación controlada
   const handleNavegar = (nuevaVista) => {
     if (nuevaVista !== 'login' && nuevaVista !== 'auth') {
       setPendientePago(false);
@@ -82,7 +79,6 @@ export function App() {
     setVistaActual(nuevaVista);
   };
 
-  // Qué hacer cuando el login es exitoso
   const handleLoginExitoso = () => {
     if (pendientePago) {
       setPendientePago(false);
@@ -93,14 +89,20 @@ export function App() {
     }
   };
 
-  // Cerrar sesión limpiando el token global
+  // Cerrar sesión con confirmación, vaciado de carrito y alerta de éxito
   const handleLogout = () => {
+    const seguro = window.confirm('¿Estás seguro de que deseas cerrar sesión?');
+    if (!seguro) return;
+
     logout();
+    setCarrito([]);
+    localStorage.removeItem('buildmypc_carrito');
     setPendientePago(false);
     setVistaActual('inicio');
+
+    alert('¡Sesión cerrada con éxito!');
   };
 
-  // Manejadores del carrito
   const handleAgregarAlCarrito = (producto, cantidad = 1) => {
     if (!producto || !producto.id) return;
     const numCantidad = Number(cantidad) || 1;
@@ -119,9 +121,10 @@ export function App() {
     setCarrito([]);
   };
 
-  // Flujo de pago protegido por sesión
-  const handleIrAPagar = () => {
+  // Recibe el total final con descuento desde el CarritoModal
+  const handleIrAPagar = (totalConDescuento) => {
     setShowCarrito(false);
+    setMontoPagoFinal(totalConDescuento); // 👈 Guardamos el total con cupón
     if (!usuario) {
       setPendientePago(true);
       setVistaActual('login');
@@ -133,12 +136,14 @@ export function App() {
   const handleConfirmarPago = (nuevoPedido) => {
     const pedidoConPropietario = {
       ...nuevoPedido,
+      total: montoPagoFinal !== null ? montoPagoFinal : nuevoPedido.total, // Asegura registrar el total con descuento
       propietario: usuario ? (usuario.nombre || usuario.email) : 'Invitado'
     };
 
     setPedidos((prev) => [pedidoConPropietario, ...prev]);
     setCarrito([]);
     setShowPago(false);
+    setMontoPagoFinal(null);
     setVistaActual('pedidos');
   };
 
@@ -149,7 +154,7 @@ export function App() {
   const renderizarVista = () => {
     switch (vistaActual) {
       case 'inicio':
-        return <Inicio onAgregar={handleAgregarAlCarrito} />;
+        return <Inicio setVista={handleNavegar} onAgregar={handleAgregarAlCarrito} />;
       case 'catalogo':
         return <Catalogo onAgregar={handleAgregarAlCarrito} />;
       case 'armador':
@@ -177,7 +182,7 @@ export function App() {
           />
         );
       default:
-        return <Inicio onAgregar={handleAgregarAlCarrito} />;
+        return <Inicio setVista={handleNavegar} onAgregar={handleAgregarAlCarrito} />;
     }
   };
 
@@ -194,7 +199,6 @@ export function App() {
 
       {renderizarVista()}
 
-      {/* Modal del Carrito */}
       <CarritoModal
         items={carrito}
         show={showCarrito}
@@ -205,10 +209,10 @@ export function App() {
         onIrAPagar={handleIrAPagar}
       />
 
-      {/* Modal de Pago / Checkout */}
       <PagoModal
         show={showPago}
         items={carrito}
+        montoTotalFinal={montoPagoFinal} // 👈 Le pasamos el total con descuento al modal de pago
         onClose={() => setShowPago(false)}
         onConfirmarPago={handleConfirmarPago}
       />

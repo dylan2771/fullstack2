@@ -3,8 +3,15 @@ const CLAVE = 'sesion';
 
 function vencida(sesion) {
   if (!sesion?.token) return true;
+  
+  // Si es nuestro token local, no intentamos parsearlo como JWT
+  if (sesion.token.startsWith('token-local-')) {
+    return false;
+  }
+
   try {
     const parte = sesion.token.split('.')[1];
+    if (!parte) return true;
     const base64 = parte.replace(/-/g, '+').replace(/_/g, '/');
     const { exp } = JSON.parse(atob(base64));
     return exp * 1000 < Date.now();

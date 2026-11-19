@@ -1,3 +1,4 @@
+// src/components/formularios/FormLogin.jsx
 import { useState } from 'react';
 import { useAuth } from '../../auth/useAuth';
 import { validarLogin } from '../../logica/validaciones';
@@ -12,7 +13,6 @@ export const FormLogin = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ejecuta la función de validación de la capa lógica
     const resultado = validarLogin(email, password);
     if (!resultado.esValido) {
       setErrores(resultado.errores);
@@ -23,7 +23,6 @@ export const FormLogin = ({ onLogin }) => {
     setCargando(true);
 
     try {
-      // Llama al contexto AuthProvider -> authService.login() -> POST /api/auth/login
       const datos = await login({ email, password });
 
       setEmail('');
@@ -41,7 +40,6 @@ export const FormLogin = ({ onLogin }) => {
 
   return (
     <section className="contenedor-login text-start">
-      {/* Alerta de Errores con Estilo Gamer */}
       {errores.length > 0 && (
         <div
           className="alert p-3 mb-4 rounded"

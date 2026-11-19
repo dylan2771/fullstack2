@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { formatearCLP, calcularTotalConIVA } from '../../logica/formato';
+// src/components/basicos/PagoModal.jsx
+import React, { useState, useEffect } from 'react';
+import { formatearCLP } from '../../logica/formato';
 
-export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
-  const [metodo, setMetodo] = useState('tarjeta');
+export function PagoModal({ show, onClose, items = [], montoTotalFinal, onConfirmarPago }) {
   const [formData, setFormData] = useState({
     nombreTarjeta: '',
     numeroTarjeta: '',
@@ -11,20 +11,25 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
   });
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (!show) {
+      setFormData({
+        nombreTarjeta: '',
+        numeroTarjeta: '',
+        expiracion: '',
+        cvv: ''
+      });
+      setError('');
+    }
+  }, [show]);
+
   if (!show) return null;
 
   const listaItems = Array.isArray(items) ? items : [];
 
-  const neto = listaItems.reduce(
-    (acc, i) => acc + (Number(i.precio) || 0) * (Number(i.cantidad) || 1),
-    0
-  );
+  // El monto total final ya viene con el descuento aplicado desde el CarritoModal
+  const totalFinal = typeof montoTotalFinal === 'number' ? montoTotalFinal : 0;
 
-  const total = typeof calcularTotalConIVA === 'function'
-    ? calcularTotalConIVA(neto)
-    : Math.round(neto * 1.19);
-
-  // Detecta la red de la tarjeta
   const detectarTipoTarjeta = (numero) => {
     const numLimpio = numero.replace(/\D/g, '');
     if (/^4/.test(numLimpio)) return { nombre: 'VISA', badge: 'bg-primary' };
@@ -35,7 +40,6 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
 
   const tipoTarjeta = detectarTipoTarjeta(formData.numeroTarjeta);
 
-  // Manejo de inputs
   const handleChangeNumeroTarjeta = (e) => {
     const soloNumeros = e.target.value.replace(/\D/g, '').slice(0, 16);
     const formateado = soloNumeros.replace(/(\d{4})(?=\d)/g, '$1 ');
@@ -63,7 +67,6 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
     setError('');
   };
 
-  // 🔴 VALIDACIÓN DE FECHA ESTRICTA (MM/AA)
   const validarFechaExpiracion = (expiracionStr) => {
     if (!expiracionStr || expiracionStr.length !== 5 || !expiracionStr.includes('/')) {
       return "Ingresa una fecha de expiración válida en formato MM/AA.";
@@ -73,34 +76,28 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
     const mes = parseInt(mesStr, 10);
     const anioDosDigitos = parseInt(anioStr, 10);
 
-    // 1. Validar que los valores ingresados sean números
     if (isNaN(mes) || isNaN(anioDosDigitos)) {
       return "Formato numérico de fecha inválido.";
     }
 
-    // 2. Validar rango del mes (01 a 12)
     if (mes < 1 || mes > 12) {
       return `El mes (${mesStr}) es inválido. Debe estar entre 01 y 12.`;
     }
 
-    // 3. Convertir año de 2 dígitos a 4 dígitos (ej: 13 -> 2013, 26 -> 2026)
     const anioCompleto = 2000 + anioDosDigitos;
-
     const fechaActual = new Date();
     const anioActual = fechaActual.getFullYear();
-    const mesActual = fechaActual.getMonth() + 1; // 1-12
+    const mesActual = fechaActual.getMonth() + 1;
 
-    // 4. Comprobar si el año ya pasó (ej: 2013 < 2026)
     if (anioCompleto < anioActual) {
-      return `Tarjeta vencida. El año 20${anioStr} ya venció (año actual: ${anioActual}).`;
+      return `Tarjeta vencida. El año 20${anioStr} ya venció.`;
     }
 
-    // 5. Comprobar si es el año actual pero un mes anterior
     if (anioCompleto === anioActual && mes < mesActual) {
       return `Tarjeta vencida. El mes ${mesStr}/20${anioStr} ya transcurrió.`;
     }
 
-    return null; // Todo correcto
+    return null;
   };
 
   const handleSubmit = (e) => {
@@ -119,11 +116,10 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
       return;
     }
 
-    // 🛑 Bloqueo inmediato en caso de error en la fecha
     const errorFecha = validarFechaExpiracion(formData.expiracion);
     if (errorFecha) {
       setError(errorFecha);
-      return; // Detiene el pago
+      return;
     }
 
     if (formData.cvv.length < 3) {
@@ -141,7 +137,7 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
         minute: '2-digit'
       }),
       items: [...listaItems],
-      total: total,
+      total: totalFinal,
       metodoPago: `${tipoTarjeta.nombre} (${formData.numeroTarjeta.slice(-4)})`,
       ultimosDigitos: formData.numeroTarjeta.slice(-4) || '4242'
     };
@@ -149,13 +145,6 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
     if (typeof onConfirmarPago === 'function') {
       onConfirmarPago(nuevoPedido);
     }
-  };
-
-  const formatearMonto = (monto) => {
-    if (typeof formatearCLP === 'function') {
-      return formatearCLP(monto);
-    }
-    return `$${Number(monto || 0).toLocaleString('es-CL')}`;
   };
 
   return (
@@ -188,7 +177,7 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
               <div 
                 className="p-3 mb-4 rounded shadow-sm text-white d-flex flex-column justify-content-between" 
                 style={{ 
-                  height: '160px', 
+                  height: '150px', 
                   background: 'linear-gradient(135deg, #1F2937 0%, #0F172A 100%)',
                   border: '1px solid #374151'
                 }}
@@ -214,7 +203,7 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
                 </div>
               </div>
 
-              <div className="row g-3">
+              <div className="row g-3 mb-4">
                 <div className="col-12 col-md-6">
                   <label className="form-label small text-secondary fw-bold">Nombre del Titular</label>
                   <input
@@ -268,14 +257,15 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
                 </div>
               </div>
 
+              {/* Resumen Final limpio con el total que ya trae el descuento del carrito */}
               <div
-                className="mt-4 p-3 rounded border border-secondary"
+                className="p-3 rounded border border-secondary"
                 style={{ backgroundColor: '#080C14' }}
               >
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="text-secondary fs-6">Monto Total a Procesar:</span>
                   <span className="text-success fs-3 fw-bold">
-                    {formatearMonto(total)}
+                    {formatearCLP(totalFinal)}
                   </span>
                 </div>
               </div>
@@ -293,7 +283,7 @@ export function PagoModal({ show, onClose, items = [], onConfirmarPago }) {
                 type="submit"
                 className="btn btn-success fw-bold text-dark px-4"
               >
-                Pagar {formatearMonto(total)}
+                Pagar {formatearCLP(totalFinal)}
               </button>
             </div>
           </form>

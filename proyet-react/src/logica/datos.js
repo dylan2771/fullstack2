@@ -1,4 +1,6 @@
+// src/logica/datos.js
 export const productos = [
+  // --- GAMER ---
   {
     id: "1",
     nombre: "Tarjeta de Video NVIDIA RTX 3060 12GB",
@@ -27,6 +29,35 @@ export const productos = [
     imagen: "https://www.hardwareluxx.de/images/cdn02/uploads/2023/Apr/timely_controller_gn/nvidia-geforce-rtx-4070-fe-00002_1920px.jpg"
   },
   {
+    id: "6",
+    nombre: "Memoria RAM Corsair Vengeance DDR5 32GB (2x16GB)",
+    precio: 129990,
+    watts: 15,
+    categoria: "GAMER",
+    stock: 30,
+    imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "8",
+    nombre: "Teclado Mecánico Gamer HyperX Alloy Origins RGB",
+    precio: 89990,
+    watts: 5,
+    categoria: "GAMER",
+    stock: 20,
+    imagen: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "9",
+    nombre: "Mouse Gamer Logitech G Pro X Superlight Wireless",
+    precio: 119990,
+    watts: 5,
+    categoria: "GAMER",
+    stock: 25,
+    imagen: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80"
+  },
+
+  // --- WORKSTATION ---
+  {
     id: "4",
     nombre: "Procesador Intel Core i9-14900K",
     precio: 629990,
@@ -45,14 +76,25 @@ export const productos = [
     imagen: "https://www.winpy.cl/files/36915-3331-ASUS-ROG-Strix-GeForce-RTX-4090-24G-1.jpg"
   },
   {
-    id: "6",
-    nombre: "Memoria RAM Corsair Vengeance DDR5 32GB (2x16GB)",
-    precio: 129990,
-    watts: 15,
-    categoria: "GAMER",
-    stock: 30,
-    imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=800&q=80"
+    id: "10",
+    nombre: "Memoria RAM Kingston FURY Renegade DDR5 64GB (2x32GB)",
+    precio: 249990,
+    watts: 25,
+    categoria: "WORKSTATION",
+    stock: 12,
+    imagen: "https://images.unsplash.com/photo-1541029071515-84cc54f84dc5?auto=format&fit=crop&w=800&q=80"
   },
+  {
+    id: "11",
+    nombre: "Monitor Profesional 32\" 4K UHD IPS HDR",
+    precio: 499990,
+    watts: 45,
+    categoria: "WORKSTATION",
+    stock: 7,
+    imagen: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80"
+  },
+
+  // --- OFICINA ---
   {
     id: "7",
     nombre: "Memoria RAM Kingston FURY Beast DDR4 16GB",
@@ -61,5 +103,32 @@ export const productos = [
     categoria: "OFICINA",
     stock: 40,
     imagen: "https://images.unsplash.com/photo-1541029071515-84cc54f84dc5?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "12",
+    nombre: "Procesador Intel Core i5-12400F",
+    precio: 139990,
+    watts: 65,
+    categoria: "OFICINA",
+    stock: 25,
+    imagen: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "13",
+    nombre: "Kit Oficina Teclado y Mouse Inalámbrico Logitech MK270",
+    precio: 29990,
+    watts: 2,
+    categoria: "OFICINA",
+    stock: 50,
+    imagen: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "14",
+    nombre: "Monitor Oficina 24\" Full HD IPS ergonómico",
+    precio: 129990,
+    watts: 20,
+    categoria: "OFICINA",
+    stock: 30,
+    imagen: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80"
   }
 ];

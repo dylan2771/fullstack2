@@ -11,3 +11,5 @@ export const Armador = ({ onAgregar }) => {
     </main>
   );
 };
+
+export default Armador;
