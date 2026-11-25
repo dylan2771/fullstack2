@@ -8,8 +8,11 @@ export async function solicitar(ruta, opciones = {}) {
   const token = sesion?.token;
   const headers = { 'Content-Type': 'application/json' };
 
-  // Solo enviamos el Bearer token si NO es un token local de respaldo
-  if (token && !token.startsWith('token-local-')) {
+  // Detectar si es una petición de registro (POST a /api/v1/users o /api/v2/users)
+  const esRegistro = ruta.includes('/users') && (opciones.method?.toUpperCase() === 'POST');
+
+  // Solo enviamos el Bearer token si HAY token, NO es local, Y NO es una ruta de registro
+  if (token && !token.startsWith('token-local-') && !esRegistro) {
     headers.Authorization = `Bearer ${token}`;
   }
 
@@ -19,8 +22,6 @@ export async function solicitar(ruta, opciones = {}) {
       headers: { ...headers, ...opciones.headers },
     });
 
-    // Si recibimos un 401 del servidor pero estamos usando token local, 
-    // no expulsamos al usuario; devolvemos un arreglo vacío o un objeto nulo según corresponda
     if (res.status === 401) {
       if (token && token.startsWith('token-local-')) {
         console.warn(`[Modo Local] El endpoint ${ruta} requiere JWT real en el servidor. Omitiendo 401.`);
@@ -38,7 +39,6 @@ export async function solicitar(ruta, opciones = {}) {
 
     return res.status === 204 ? null : res.json();
   } catch (error) {
-    // Si el servidor rechaza por completo la conexión o da error de red/401 en modo local
     if (token && token.startsWith('token-local-')) {
       console.warn(`[Modo Local] Capturado error en ${ruta}:`, error.message);
       return ruta.includes('builds') ? [] : null;

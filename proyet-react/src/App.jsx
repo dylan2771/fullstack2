@@ -24,7 +24,9 @@ import {
 } from './logica/carrito';
 
 export function App() {
-  const { usuario, logout } = useAuth();
+  const { usuario: usuarioAuth, logout } = useAuth();
+  const [usuarioSesion, setUsuarioSesion] = useState(null);
+  const usuario = usuarioAuth || usuarioSesion;
 
   const [vistaActual, setVistaActual] = useState('inicio');
   const [showCarrito, setShowCarrito] = useState(false);
@@ -79,7 +81,10 @@ export function App() {
     setVistaActual(nuevaVista);
   };
 
-  const handleLoginExitoso = () => {
+  const handleLoginExitoso = (usuarioLogueado) => {
+    if (usuarioLogueado) {
+      setUsuarioSesion(usuarioLogueado);
+    }
     if (pendientePago) {
       setPendientePago(false);
       setVistaActual('inicio');
@@ -95,6 +100,7 @@ export function App() {
     if (!seguro) return;
 
     logout();
+    setUsuarioSesion(null);
     setCarrito([]);
     localStorage.removeItem('buildmypc_carrito');
     setPendientePago(false);

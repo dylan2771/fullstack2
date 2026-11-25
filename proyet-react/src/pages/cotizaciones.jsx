@@ -14,8 +14,8 @@ export function Cotizaciones({ usuario, onAgregar }) {
     const cargarCotizacionesBackend = async () => {
       if (!usuario) return;
       try {
-        // CORREGIDO: Usar /v1/builds para evitar la duplicación de /api/
-        const data = await solicitar('/v1/builds');
+        // CORREGIDO: Usar /api/v1/builds para que el Gateway rutee correctamente al builder-service
+        const data = await solicitar('/api/v1/builds');
         if (Array.isArray(data)) {
           const mapeadas = data.map((item) => ({
             id: String(item.id || `COT-${Date.now().toString().slice(-5)}`),
@@ -68,8 +68,8 @@ export function Cotizaciones({ usuario, onAgregar }) {
     };
 
     try {
-      // CORREGIDO: Usar /v1/builds en lugar de /api/v1/builds
-      const respuestaBackend = await solicitar('/v1/builds', {
+      // CORREGIDO: Usar /api/v1/builds para conectar con el backend
+      const respuestaBackend = await solicitar('/api/v1/builds', {
         method: 'POST',
         body: JSON.stringify(nuevaPayload),
       });
@@ -100,8 +100,8 @@ export function Cotizaciones({ usuario, onAgregar }) {
 
   const handleEliminarCotizacion = async (id) => {
     try {
-      // CORREGIDO: Usar /v1/builds en lugar de /api/v1/builds
-      await solicitar(`/v1/builds/${id}`, { method: 'DELETE' });
+      // CORREGIDO: Usar /api/v1/builds para eliminar en el backend
+      await solicitar(`/api/v1/builds/${id}`, { method: 'DELETE' });
     } catch (err) {
       console.warn('No se pudo eliminar en el backend, removiendo localmente:', err);
     }
