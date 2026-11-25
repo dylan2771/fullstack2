@@ -9,17 +9,15 @@ export function Cotizaciones({ usuario, onAgregar }) {
   const [cargando, setCargando] = useState(true);
   const [mensajeExito, setMensajeExito] = useState('');
 
-  // Cargar cotizaciones desde el builder-service a través del Gateway
   useEffect(() => {
     const cargarCotizacionesBackend = async () => {
       if (!usuario) return;
       try {
-        // CORREGIDO: Usar /api/v1/builds para que el Gateway rutee correctamente al builder-service
         const data = await solicitar('/api/v1/builds');
         if (Array.isArray(data)) {
           const mapeadas = data.map((item) => ({
             id: String(item.id || `COT-${Date.now().toString().slice(-5)}`),
-            titulo: item.titulo || item.nombreArmado || 'Mi PC Armado',
+            titulo: item.titulo || item.nombreEnsamble || 'Mi PC Armado',
             propietario: usuario.nombre || usuario.email,
             fecha: item.fecha || new Date().toLocaleDateString('es-CL'),
             totalWatts: item.totalWatts || item.consumoTotal || 0,
@@ -57,18 +55,13 @@ export function Cotizaciones({ usuario, onAgregar }) {
   }
 
   const handleGuardarCotizacion = async (datosCotizacion) => {
+    // CORREGIDO: Usamos directamente los datos que vienen de CalculadoraWatts (incluyendo nombreEnsamble y IDs)
     const nuevaPayload = {
-      titulo: datosCotizacion.titulo || 'Mi PC Armado',
-      totalWatts: datosCotizacion.totalWatts,
-      fuenteRecomendada: datosCotizacion.fuenteRecomendada,
-      subtotal: datosCotizacion.subtotal,
-      iva: datosCotizacion.iva,
-      totalFinal: datosCotizacion.totalFinal,
-      items: datosCotizacion.items
+      ...datosCotizacion,
+      userId: usuario.id || 1
     };
 
     try {
-      // CORREGIDO: Usar /api/v1/builds para conectar con el backend
       const respuestaBackend = await solicitar('/api/v1/builds', {
         method: 'POST',
         body: JSON.stringify(nuevaPayload),
@@ -82,7 +75,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
       };
 
       setCotizaciones((prev) => [nueva, ...prev]);
-      setMensajeExito(`Cotización "${nueva.titulo}" guardada y sincronizada con éxito.`);
+      setMensajeExito(`Cotización "${nueva.titulo || nueva.nombreEnsamble}" guardada y sincronizada con éxito.`);
     } catch (err) {
       console.warn('Error al guardar en el backend, guardando localmente:', err);
       const nuevaLocal = {
@@ -92,7 +85,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
         ...datosCotizacion,
       };
       setCotizaciones((prev) => [nuevaLocal, ...prev]);
-      setMensajeExito(`Cotización "${nuevaLocal.titulo}" guardada localmente.`);
+      setMensajeExito(`Cotización "${nuevaLocal.titulo || nuevaLocal.nombreEnsamble}" guardada localmente.`);
     }
 
     setTimeout(() => setMensajeExito(''), 3500);
@@ -100,7 +93,6 @@ export function Cotizaciones({ usuario, onAgregar }) {
 
   const handleEliminarCotizacion = async (id) => {
     try {
-      // CORREGIDO: Usar /api/v1/builds para eliminar en el backend
       await solicitar(`/api/v1/builds/${id}`, { method: 'DELETE' });
     } catch (err) {
       console.warn('No se pudo eliminar en el backend, removiendo localmente:', err);
@@ -111,7 +103,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
   const handlePasarAlCarrito = (cotizacion) => {
     if (typeof onAgregar !== 'function') return;
     cotizacion.items.forEach((item) => onAgregar(item, 1));
-    setMensajeExito(`Componentes de "${cotizacion.titulo}" agregados al carrito.`);
+    setMensajeExito(`Componentes de "${cotizacion.titulo || cotizacion.nombreEnsamble}" agregados al carrito.`);
     setTimeout(() => setMensajeExito(''), 3500);
   };
 
@@ -120,7 +112,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
     contenido += "         BUILDMYPC - COTIZACIÓN         \n";
     contenido += "========================================\n\n";
     contenido += `ID Cotización: ${cot.id}\n`;
-    contenido += `Título: ${cot.titulo}\n`;
+    contenido += `Título: ${cot.titulo || cot.nombreEnsamble}\n`;
     contenido += `Cliente: ${cot.propietario}\n`;
     contenido += `Fecha: ${cot.fecha}\n`;
     contenido += `Consumo Estimado: ${cot.totalWatts}W (Fuente recomendada: ${cot.fuenteRecomendada}W)\n\n`;
@@ -142,7 +134,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${cot.id}-${cot.titulo.replace(/\s+/g, '_')}.txt`;
+    link.download = `${cot.id}-${(cot.titulo || cot.nombreEnsamble).replace(/\s+/g, '_')}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -211,7 +203,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
                       >
                         {cot.id}
                       </span>
-                      <span className="fw-bold fs-5">{cot.titulo}</span>
+                      <span className="fw-bold fs-5">{cot.titulo || cot.nombreEnsamble}</span>
                       <div className="text-secondary small mt-1">
                         Fecha: {cot.fecha} • ⚡ {cot.totalWatts}W (Fuente: {cot.fuenteRecomendada}W)
                       </div>

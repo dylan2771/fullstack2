@@ -37,8 +37,8 @@ const LISTA_PRODUCTOS_COMPLETA = [
 
 export const CalculadoraWatts = ({ onGuardarCotizacion }) => {
   const [seleccionados, setSeleccionados] = useState([]);
-  const [tipoSeccion, setTipoSeccion] = useState('todos'); // 'todos', 'componente', 'periferico'
-  const [categoriaFiltro, setCategoriaFiltro] = useState('TODAS'); // 'TODAS', 'GAMER', 'WORKSTATION', 'OFICINA'
+  const [tipoSeccion, setTipoSeccion] = useState('todos');
+  const [categoriaFiltro, setCategoriaFiltro] = useState('TODAS');
   const [nombreCotizacion, setNombreCotizacion] = useState('');
   const [mensajeCopiado, setMensajeCopiado] = useState(false);
 
@@ -75,22 +75,50 @@ export const CalculadoraWatts = ({ onGuardarCotizacion }) => {
 
   const handleGuardar = () => {
     if (seleccionados.length === 0 || typeof onGuardarCotizacion !== 'function') return;
+
+    let cpuId = null;
+    let gpuId = null;
+    let motherboardId = null;
+    let ramId = null;
+    let storageId = null;
+    let psuId = null;
+
+    seleccionados.forEach(p => {
+      const n = p.nombre.toLowerCase();
+      if (n.includes('procesador') || n.includes('ryzen') || n.includes('intel core')) cpuId = Number(p.id);
+      else if (n.includes('rtx') || n.includes('tarjeta de video')) gpuId = Number(p.id);
+      else if (n.includes('placa madre')) motherboardId = Number(p.id);
+      else if (n.includes('memoria ram')) ramId = Number(p.id);
+      else if (n.includes('fuente de poder')) psuId = Number(p.id);
+      else if (n.includes('ssd') || n.includes('disco') || n.includes('almacenamiento')) storageId = Number(p.id);
+    });
+
+    const nombreFinal = nombreCotizacion.trim() || 'Armado PC Personalizado';
+
     onGuardarCotizacion({
-      titulo: nombreCotizacion.trim() || 'Armado PC Personalizado',
+      nombreEnsamble: nombreFinal, // 👈 Obligatorio para el DTO del backend
+      titulo: nombreFinal,         // Mantenido para el frontend
       items: seleccionados,
       totalWatts,
       fuenteRecomendada,
       subtotal: subtotalPrecio,
       iva: ivaCalculado,
       totalFinal: totalConIVA,
+      userId: 1,
+      cpuId: cpuId || 2,
+      gpuId: gpuId || 1,
+      motherboardId: motherboardId || 21,
+      ramId: ramId || 6,
+      storageId: storageId || 7,
+      psuId: psuId || 22
     });
+
     setNombreCotizacion('');
     setSeleccionados([]);
   };
 
   return (
     <section className="container py-2 text-start">
-      {/* 1. Panel Superior de Selección: Todos / Componentes PC / Periféricos */}
       <div className="card p-3 mb-3 text-white" style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px' }}>
         <div className="d-flex flex-wrap gap-2 align-items-center">
           <button
@@ -120,7 +148,6 @@ export const CalculadoraWatts = ({ onGuardarCotizacion }) => {
         </div>
       </div>
 
-      {/* 2. Barra de Filtros por Categoría (Gamer / Workstation / Oficina) */}
       <div className="card p-3 mb-4 text-white" style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px' }}>
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
           <div>
@@ -145,7 +172,6 @@ export const CalculadoraWatts = ({ onGuardarCotizacion }) => {
       </div>
 
       <div className="row g-4">
-        {/* Grilla de Productos */}
         <div className="col-lg-7 col-xl-8">
           {productosFiltrados.length === 0 ? (
             <div className="card p-4 text-center text-white" style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px' }}>
@@ -205,7 +231,6 @@ export const CalculadoraWatts = ({ onGuardarCotizacion }) => {
           )}
         </div>
 
-        {/* Panel lateral de resumen */}
         <div className="col-lg-5 col-xl-4">
           <div className="card p-4 text-white shadow" style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px', position: 'sticky', top: '90px' }}>
             <h5 className="fw-bold mb-3 d-flex justify-content-between align-items-center" style={{ color: '#00FF66' }}>

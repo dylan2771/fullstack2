@@ -8,11 +8,12 @@ export async function solicitar(ruta, opciones = {}) {
   const token = sesion?.token;
   const headers = { 'Content-Type': 'application/json' };
 
-  // Detectar si es una petición de registro (POST a /api/v1/users o /api/v2/users)
   const esRegistro = ruta.includes('/users') && (opciones.method?.toUpperCase() === 'POST');
+  const esBuild = ruta.includes('/builds');
+  const esTokenRealJWT = Boolean(token && token.split('.').length === 3);
 
-  // Solo enviamos el Bearer token si HAY token, NO es local, Y NO es una ruta de registro
-  if (token && !token.startsWith('token-local-') && !esRegistro) {
+  // Solo adjuntamos Authorization si es un JWT HS256 real (3 segmentos) y no es ruta pública (/builds o registro)
+  if (esTokenRealJWT && !esRegistro && !esBuild) {
     headers.Authorization = `Bearer ${token}`;
   }
 
@@ -23,11 +24,10 @@ export async function solicitar(ruta, opciones = {}) {
     });
 
     if (res.status === 401) {
-      if (token && token.startsWith('token-local-')) {
-        console.warn(`[Modo Local] El endpoint ${ruta} requiere JWT real en el servidor. Omitiendo 401.`);
-        return ruta.includes('builds') ? [] : null;
+      if (!esTokenRealJWT) {
+        console.warn(`[Sesión local] El endpoint ${ruta} devolvió 401.`);
+        return esBuild ? [] : null;
       }
-      
       borrarSesion();
       window.dispatchEvent(new Event('sesion-expirada'));
     }
@@ -39,9 +39,8 @@ export async function solicitar(ruta, opciones = {}) {
 
     return res.status === 204 ? null : res.json();
   } catch (error) {
-    if (token && token.startsWith('token-local-')) {
-      console.warn(`[Modo Local] Capturado error en ${ruta}:`, error.message);
-      return ruta.includes('builds') ? [] : null;
+    if (!esTokenRealJWT && esBuild) {
+      return [];
     }
     throw error;
   }
