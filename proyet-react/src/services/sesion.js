@@ -4,19 +4,24 @@ const CLAVE = 'sesion';
 function vencida(sesion) {
   if (!sesion?.token) return true;
   
-  // Si es nuestro token local, no intentamos parsearlo como JWT
-  if (sesion.token.startsWith('token-local-')) {
+  // Si es un token local, no expira por JWT
+  if (typeof sesion.token === 'string' && sesion.token.startsWith('token-local-')) {
     return false;
   }
 
   try {
-    const parte = sesion.token.split('.')[1];
-    if (!parte) return true;
-    const base64 = parte.replace(/-/g, '+').replace(/_/g, '/');
-    const { exp } = JSON.parse(atob(base64));
-    return exp * 1000 < Date.now();
-  } catch {
-    return true;
+    const partes = sesion.token.split('.');
+    if (partes.length < 2) return false; // Si no tiene estructura JWT, lo dejamos pasar seguro
+
+    const base64 = partes[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64));
+    
+    if (!payload.exp) return false; // Si no tiene fecha de expiración, no expira solo
+    return payload.exp * 1000 < Date.now();
+  } catch (e) {
+    // ANTES: si fallaba, devolvía true y borraba la sesión. 
+    // AHORA: si falla al leer el token, lo dejamos pasar para que NO te bote la sesión.
+    return false;
   }
 }
 

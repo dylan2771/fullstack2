@@ -1,5 +1,6 @@
 // src/pages/Catalogo.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { componentesService } from '../services/componentes';
 import { formatearCLP } from '../logica/formato';
 
 const PRODUCTOS_CATALOGO = [
@@ -243,12 +244,58 @@ const PRODUCTOS_CATALOGO = [
 ];
 
 export function Catalogo({ onAgregar }) {
+  const [productos, setProductos] = useState(PRODUCTOS_CATALOGO);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+
   const [tipoSeleccionado, setTipoSeleccionado] = useState('todos'); // 'todos', 'componente', 'periferico'
   const [mensajeExito, setMensajeExito] = useState('');
 
-  const productosFiltrados = tipoSeleccionado === 'todos' 
-    ? PRODUCTOS_CATALOGO 
-    : PRODUCTOS_CATALOGO.filter(p => p.tipo === tipoSeleccionado);
+  useEffect(() => {
+    const control = new AbortController();
+
+    async function cargarDatos() {
+      try {
+        setCargando(true);
+        const datosBackend = await componentesService.listar({ signal: control.signal });
+
+        if (Array.isArray(datosBackend) && datosBackend.length > 0) {
+          const idsFrontend = new Set(PRODUCTOS_CATALOGO.map((p) => String(p.id)));
+          const nuevosDelBackend = datosBackend
+            .filter((p) => !idsFrontend.has(String(p.id)))
+            .map((p) => ({
+              ...p,
+              id: String(p.id),
+              categoria: p.categoria || 'GAMER',
+              tipo: p.tipo || 'componente',
+              imagen:
+                p.imagen ||
+                'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+            }));
+
+          setProductos([...PRODUCTOS_CATALOGO, ...nuevosDelBackend]);
+        } else {
+          setProductos(PRODUCTOS_CATALOGO);
+        }
+
+        setError(null);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setError(e.message || 'Error al conectar con el servidor.');
+        }
+      } finally {
+        setCargando(false);
+      }
+    }
+
+    cargarDatos();
+    return () => control.abort();
+  }, []);
+
+  const productosFiltrados =
+    tipoSeleccionado === 'todos'
+      ? productos
+      : productos.filter((p) => (p.tipo || 'componente') === tipoSeleccionado);
 
   const handleAgregarCarrito = (prod) => {
     if (typeof onAgregar === 'function') {
@@ -257,6 +304,15 @@ export function Catalogo({ onAgregar }) {
       setTimeout(() => setMensajeExito(''), 3000);
     }
   };
+
+  if (cargando) {
+    return (
+      <main className="container py-5 text-center text-white my-5">
+        <div className="spinner-border text-success mb-3" role="status"></div>
+        <h5>Cargando catálogo de productos...</h5>
+      </main>
+    );
+  }
 
   return (
     <main className="container py-4 text-start">
@@ -269,8 +325,21 @@ export function Catalogo({ onAgregar }) {
           Explora nuestra selección de componentes de hardware y periféricos de alta gama.
         </p>
 
+        {error && (
+          <div className="alert alert-warning fw-bold py-2">
+            ⚠️ Aviso de conexión con el backend: {error} (Mostrando catálogo local).
+          </div>
+        )}
+
         {mensajeExito && (
-          <div className="alert fw-bold py-2" style={{ backgroundColor: 'rgba(0, 255, 102, 0.15)', border: '1px solid #00FF66', color: '#00FF66' }}>
+          <div
+            className="alert fw-bold py-2"
+            style={{
+              backgroundColor: 'rgba(0, 255, 102, 0.15)',
+              border: '1px solid #00FF66',
+              color: '#00FF66',
+            }}
+          >
             ✅ {mensajeExito}
           </div>
         )}
@@ -280,26 +349,48 @@ export function Catalogo({ onAgregar }) {
           <button
             type="button"
             onClick={() => setTipoSeleccionado('todos')}
-            className={`btn fw-bold px-4 ${tipoSeleccionado === 'todos' ? 'btn-success' : 'btn-outline-secondary text-white'}`}
-            style={tipoSeleccionado === 'todos' ? { backgroundColor: '#00FF66', color: '#000', border: 'none' } : {}}
+            className={`btn fw-bold px-4 ${
+              tipoSeleccionado === 'todos' ? 'btn-success' : 'btn-outline-secondary text-white'
+            }`}
+            style={
+              tipoSeleccionado === 'todos'
+                ? { backgroundColor: '#00FF66', color: '#000', border: 'none' }
+                : {}
+            }
           >
-            📦 Todos ({PRODUCTOS_CATALOGO.length})
+            📦 Todos ({productos.length})
           </button>
           <button
             type="button"
             onClick={() => setTipoSeleccionado('componente')}
-            className={`btn fw-bold px-4 ${tipoSeleccionado === 'componente' ? 'btn-success' : 'btn-outline-secondary text-white'}`}
-            style={tipoSeleccionado === 'componente' ? { backgroundColor: '#00FF66', color: '#000', border: 'none' } : {}}
+            className={`btn fw-bold px-4 ${
+              tipoSeleccionado === 'componente'
+                ? 'btn-success'
+                : 'btn-outline-secondary text-white'
+            }`}
+            style={
+              tipoSeleccionado === 'componente'
+                ? { backgroundColor: '#00FF66', color: '#000', border: 'none' }
+                : {}
+            }
           >
-            🖥️ Componentes PC ({PRODUCTOS_CATALOGO.filter(p => p.tipo === 'componente').length})
+            🖥️ Componentes PC ({productos.filter((p) => (p.tipo || 'componente') === 'componente').length})
           </button>
           <button
             type="button"
             onClick={() => setTipoSeleccionado('periferico')}
-            className={`btn fw-bold px-4 ${tipoSeleccionado === 'periferico' ? 'btn-success' : 'btn-outline-secondary text-white'}`}
-            style={tipoSeleccionado === 'periferico' ? { backgroundColor: '#00FF66', color: '#000', border: 'none' } : {}}
+            className={`btn fw-bold px-4 ${
+              tipoSeleccionado === 'periferico'
+                ? 'btn-success'
+                : 'btn-outline-secondary text-white'
+            }`}
+            style={
+              tipoSeleccionado === 'periferico'
+                ? { backgroundColor: '#00FF66', color: '#000', border: 'none' }
+                : {}
+            }
           >
-            🎧 Periféricos y Accesorios ({PRODUCTOS_CATALOGO.filter(p => p.tipo === 'periferico').length})
+            🎧 Periféricos y Accesorios ({productos.filter((p) => p.tipo === 'periferico').length})
           </button>
         </div>
       </div>
@@ -308,29 +399,50 @@ export function Catalogo({ onAgregar }) {
       <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         {productosFiltrados.map((prod) => (
           <div className="col" key={prod.id}>
-            <div 
+            <div
               className="card h-100 text-white p-3 shadow-sm"
-              style={{ backgroundColor: '#111827', border: '1px solid #1F2937', borderRadius: '12px' }}
+              style={{
+                backgroundColor: '#111827',
+                border: '1px solid #1F2937',
+                borderRadius: '12px',
+              }}
             >
-              <img 
-                src={prod.imagen} 
+              <img
+                src={prod.imagen}
                 alt={prod.nombre}
-                onError={(e) => { e.target.src = 'https://via.placeholder.com/200?text=BuildMyPC'; }}
-                style={{ height: '160px', objectFit: 'cover', borderRadius: '8px', backgroundColor: '#0B0F19' }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/200?text=BuildMyPC';
+                }}
+                style={{
+                  height: '160px',
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  backgroundColor: '#0B0F19',
+                }}
                 className="mb-3"
               />
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="badge text-uppercase" style={{ backgroundColor: '#1F2937', color: '#00FF66', fontSize: '0.75rem' }}>
-                  {prod.categoria}
+                <span
+                  className="badge text-uppercase"
+                  style={{ backgroundColor: '#1F2937', color: '#00FF66', fontSize: '0.75rem' }}
+                >
+                  {prod.categoria || 'GAMER'}
                 </span>
-                <span className="badge text-uppercase bg-dark text-secondary border border-secondary" style={{ fontSize: '0.65rem' }}>
-                  {prod.tipo}
+                <span
+                  className="badge text-uppercase bg-dark text-secondary border border-secondary"
+                  style={{ fontSize: '0.65rem' }}
+                >
+                  {prod.tipo || 'componente'}
                 </span>
               </div>
-              <h6 className="fw-bold mb-3 text-white" style={{ minHeight: '40px' }}>{prod.nombre}</h6>
-              
+              <h6 className="fw-bold mb-3 text-white" style={{ minHeight: '40px' }}>
+                {prod.nombre}
+              </h6>
+
               <div className="mt-auto pt-2 border-top border-secondary d-flex justify-content-between align-items-center">
-                <span className="fw-bold fs-5" style={{ color: '#00FF66' }}>{formatearCLP(prod.precio)}</span>
+                <span className="fw-bold fs-5" style={{ color: '#00FF66' }}>
+                  {formatearCLP(prod.precio)}
+                </span>
                 <button
                   type="button"
                   className="btn btn-sm fw-bold px-3"

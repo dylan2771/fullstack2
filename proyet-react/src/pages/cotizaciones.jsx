@@ -1,26 +1,49 @@
+// src/pages/Cotizaciones.jsx
 import { useState, useEffect } from 'react';
 import { CalculadoraWatts } from '../components/estado/CalculadoraWatts';
 import { formatearCLP } from '../logica/formato';
+import { solicitar } from '../services/api';
 
 export function Cotizaciones({ usuario, onAgregar }) {
-  const [cotizaciones, setCotizaciones] = useState(() => {
-    try {
-      const guardado = localStorage.getItem('buildmypc_cotizaciones');
-      return guardado ? JSON.parse(guardado) : [];
-    } catch {
-      return [];
-    }
-  });
-
+  const [cotizaciones, setCotizaciones] = useState([]);
+  const [cargando, setCargando] = useState(true);
   const [mensajeExito, setMensajeExito] = useState('');
 
+  // Cargar cotizaciones desde el builder-service a través del Gateway
   useEffect(() => {
-    try {
-      localStorage.setItem('buildmypc_cotizaciones', JSON.stringify(cotizaciones));
-    } catch (e) {
-      console.error('Error al guardar cotizaciones:', e);
-    }
-  }, [cotizaciones]);
+    const cargarCotizacionesBackend = async () => {
+      if (!usuario) return;
+      try {
+        // CORREGIDO: Usar /v1/builds para evitar la duplicación de /api/
+        const data = await solicitar('/v1/builds');
+        if (Array.isArray(data)) {
+          const mapeadas = data.map((item) => ({
+            id: String(item.id || `COT-${Date.now().toString().slice(-5)}`),
+            titulo: item.titulo || item.nombreArmado || 'Mi PC Armado',
+            propietario: usuario.nombre || usuario.email,
+            fecha: item.fecha || new Date().toLocaleDateString('es-CL'),
+            totalWatts: item.totalWatts || item.consumoTotal || 0,
+            fuenteRecomendada: item.fuenteRecomendada || 500,
+            subtotal: item.subtotal || 0,
+            iva: item.iva || 0,
+            totalFinal: item.totalFinal || item.precioTotal || 0,
+            items: item.items || item.componentes || []
+          }));
+          setCotizaciones(mapeadas);
+        }
+      } catch (err) {
+        console.warn('Aviso: No se pudieron cargar cotizaciones del backend, usando respaldo local:', err.message);
+        const guardado = localStorage.getItem('buildmypc_cotizaciones');
+        if (guardado) {
+          try { setCotizaciones(JSON.parse(guardado)); } catch {}
+        }
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarCotizacionesBackend();
+  }, [usuario]);
 
   if (!usuario) {
     return (
@@ -33,21 +56,56 @@ export function Cotizaciones({ usuario, onAgregar }) {
     );
   }
 
-  const handleGuardarCotizacion = (datosCotizacion) => {
-    const nueva = {
-      id: `COT-${Date.now().toString().slice(-5)}`,
-      propietario: usuario.nombre,
-      fecha: new Date().toLocaleDateString('es-CL'),
-      ...datosCotizacion,
+  const handleGuardarCotizacion = async (datosCotizacion) => {
+    const nuevaPayload = {
+      titulo: datosCotizacion.titulo || 'Mi PC Armado',
+      totalWatts: datosCotizacion.totalWatts,
+      fuenteRecomendada: datosCotizacion.fuenteRecomendada,
+      subtotal: datosCotizacion.subtotal,
+      iva: datosCotizacion.iva,
+      totalFinal: datosCotizacion.totalFinal,
+      items: datosCotizacion.items
     };
 
-    setCotizaciones((prev) => [nueva, ...prev]);
-    setMensajeExito(`Cotización "${nueva.titulo}" guardada con éxito.`);
+    try {
+      // CORREGIDO: Usar /v1/builds en lugar de /api/v1/builds
+      const respuestaBackend = await solicitar('/v1/builds', {
+        method: 'POST',
+        body: JSON.stringify(nuevaPayload),
+      });
+
+      const nueva = {
+        id: String(respuestaBackend?.id || `COT-${Date.now().toString().slice(-5)}`),
+        propietario: usuario.nombre || usuario.email,
+        fecha: new Date().toLocaleDateString('es-CL'),
+        ...datosCotizacion,
+      };
+
+      setCotizaciones((prev) => [nueva, ...prev]);
+      setMensajeExito(`Cotización "${nueva.titulo}" guardada y sincronizada con éxito.`);
+    } catch (err) {
+      console.warn('Error al guardar en el backend, guardando localmente:', err);
+      const nuevaLocal = {
+        id: `COT-${Date.now().toString().slice(-5)}`,
+        propietario: usuario.nombre || usuario.email,
+        fecha: new Date().toLocaleDateString('es-CL'),
+        ...datosCotizacion,
+      };
+      setCotizaciones((prev) => [nuevaLocal, ...prev]);
+      setMensajeExito(`Cotización "${nuevaLocal.titulo}" guardada localmente.`);
+    }
+
     setTimeout(() => setMensajeExito(''), 3500);
   };
 
-  const handleEliminarCotizacion = (id) => {
-    setCotizaciones((prev) => prev.filter((c) => c.id !== id));
+  const handleEliminarCotizacion = async (id) => {
+    try {
+      // CORREGIDO: Usar /v1/builds en lugar de /api/v1/builds
+      await solicitar(`/v1/builds/${id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('No se pudo eliminar en el backend, removiendo localmente:', err);
+    }
+    setCotizaciones((prev) => cotizaciones.filter((c) => c.id !== id));
   };
 
   const handlePasarAlCarrito = (cotizacion) => {
@@ -91,7 +149,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
     URL.revokeObjectURL(url);
   };
 
-  const misCotizaciones = cotizaciones.filter((c) => c.propietario === usuario.nombre);
+  const misCotizaciones = cotizaciones.filter((c) => c.propietario === (usuario.nombre || usuario.email));
 
   return (
     <main className="py-4">
@@ -100,14 +158,16 @@ export function Cotizaciones({ usuario, onAgregar }) {
           className="badge mb-2 px-3 py-2 fw-bold"
           style={{ backgroundColor: 'rgba(0, 255, 102, 0.15)', color: '#00FF66', border: '1px solid #00FF66' }}
         >
-          👤 Cotizador de {usuario.nombre}
+          👤 Cotizador de {usuario.nombre || usuario.email}
         </span>
         <h1 className="display-5 fw-bold mb-1" style={{ color: '#00FF66' }}>
           Cotizaciones de PC
         </h1>
         <p className="text-secondary mb-0">
-          Arma tu presupuesto, revisa el consumo en Watts y guarda el valor final con IVA en tu cuenta.
+          Arma tu presupuesto, revisa el consumo en Watts y guarda el valor final con IVA en tu cuenta conectada al servidor.
         </p>
+
+        {cargando && <div className="text-info mt-2">🔄 Sincronizando cotizaciones con el servidor...</div>}
 
         {mensajeExito && (
           <div
@@ -123,7 +183,7 @@ export function Cotizaciones({ usuario, onAgregar }) {
 
       <section className="container mt-5 text-start">
         <h3 className="fw-bold mb-3 text-white">
-          📋 Cotizaciones Guardadas de {usuario.nombre} ({misCotizaciones.length})
+          📋 Cotizaciones Guardadas de {usuario.nombre || usuario.email} ({misCotizaciones.length})
         </h3>
 
         {misCotizaciones.length === 0 ? (
@@ -165,9 +225,9 @@ export function Cotizaciones({ usuario, onAgregar }) {
                   </div>
 
                   <ul className="list-unstyled small mb-3 flex-grow-1">
-                    {cot.items.map((item) => (
+                    {cot.items?.map((item, idx) => (
                       <li
-                        key={item.id}
+                        key={item.id || idx}
                         className="d-flex justify-content-between py-1 border-bottom border-dark"
                       >
                         <span>• {item.nombre}</span>
