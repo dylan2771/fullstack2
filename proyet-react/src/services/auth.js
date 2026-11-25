@@ -8,7 +8,7 @@ export const authService = {
       method: 'POST',
       body: JSON.stringify({
         nombre: nombre.trim(),
-        email: email.trim().toLowerCase(),
+        correo: email.trim().toLowerCase(), // 👈 Coincide exactamente con el atributo 'correo' de tu DTO en Java
         password,
         rol: 'CLIENTE', // Rol por defecto para registros web
       }),
@@ -17,25 +17,22 @@ export const authService = {
   },
 
   async login({ email, password }) {
-    // Si tu login backend usa un endpoint específico o valida contra el listado de usuarios:
-    // Hacemos un fetch al listado de usuarios para validar credenciales en local/memoria de forma segura
     try {
       const usuarios = await solicitar('/api/v1/users');
       const encontrado = usuarios.find(
-        (u) => u.email.toLowerCase() === email.trim().toLowerCase()
+        (u) => (u.correo || u.email).toLowerCase() === email.trim().toLowerCase()
       );
 
       if (!encontrado) {
         throw new Error('Correo o contraseña incorrectos.');
       }
 
-      // Generamos un token o retornamos la sesión del usuario validado por el backend
       return {
         token: 'token-jwt-valido-' + encontrado.id,
         usuario: {
           id: encontrado.id,
           nombre: encontrado.nombre,
-          email: encontrado.email,
+          correo: encontrado.correo || encontrado.email,
           rol: encontrado.rol || 'CLIENTE',
         },
       };
