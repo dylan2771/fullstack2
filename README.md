@@ -1,6 +1,7 @@
 # ⚡ BuildMyPC — Plataforma Fullstack de Configuración de Hardware
 
 Aplicación web desarrollada como Evaluación Parcial N° 3 para la asignatura **DSY1104 • Desarrollo Fullstack II** en **Duoc UC** (Sede Valparaíso). El sistema implementa una arquitectura de microservicios desacoplados en Spring Boot con descubrimiento dinámico (Eureka), API Gateway, autenticación JWT basada en roles y un frontend moderno en React 18.
+https://fullstack2-zeta.vercel.app/
 
 ---
 
