@@ -9,11 +9,10 @@ export async function solicitar(ruta, opciones = {}) {
   const headers = { 'Content-Type': 'application/json' };
 
   const esRegistro = ruta.includes('/users') && (opciones.method?.toUpperCase() === 'POST');
-  const esBuild = ruta.includes('/builds');
   const esTokenRealJWT = Boolean(token && token.split('.').length === 3);
 
-  // Solo adjuntamos Authorization si es un JWT HS256 real (3 segmentos) y no es ruta pública (/builds o registro)
-  if (esTokenRealJWT && !esRegistro && !esBuild) {
+  // Adjuntamos la autorización si es un JWT válido (excepto en el registro de usuarios)
+  if (esTokenRealJWT && !esRegistro) {
     headers.Authorization = `Bearer ${token}`;
   }
 
@@ -26,7 +25,7 @@ export async function solicitar(ruta, opciones = {}) {
     if (res.status === 401) {
       if (!esTokenRealJWT) {
         console.warn(`[Sesión local] El endpoint ${ruta} devolvió 401.`);
-        return esBuild ? [] : null;
+        return ruta.includes('/builds') ? [] : null;
       }
       borrarSesion();
       window.dispatchEvent(new Event('sesion-expirada'));
@@ -39,7 +38,7 @@ export async function solicitar(ruta, opciones = {}) {
 
     return res.status === 204 ? null : res.json();
   } catch (error) {
-    if (!esTokenRealJWT && esBuild) {
+    if (!esTokenRealJWT && ruta.includes('/builds')) {
       return [];
     }
     throw error;
